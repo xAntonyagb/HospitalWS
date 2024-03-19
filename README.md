@@ -1,7 +1,12 @@
 # HospitalWS
 Repositório para entrega do trabalho bimestral da matéria da faculdade Programação para internet
 
+
+
+
 Banco de dados:
+
+
 CREATE TABLE tb_medico (
     id SERIAL PRIMARY KEY NOT NULL,
     nome VARCHAR,
