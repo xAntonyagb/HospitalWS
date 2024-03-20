@@ -13,12 +13,12 @@ public class MedicoWebServiceImp implements MedicoWebService{
     private static MedicoService medicoService = new MedicoService();
 
     @Override
-    public MedicoModel insertMedico() throws ValidationException {
+    public MedicoModel insertMedico(MedicoModel medicoModel) throws ValidationException {
         return null;
     }
 
     @Override
-    public ArrayList<MedicoModel> getMedicoById() throws ValidationException {
+    public MedicoModel getMedicoById(int id) throws ValidationException {
         return null;
     }
 
@@ -28,12 +28,12 @@ public class MedicoWebServiceImp implements MedicoWebService{
     }
 
     @Override
-    public MedicoModel updateMedico() throws ValidationException {
+    public MedicoModel updateMedico(MedicoModel medicoModel) throws ValidationException {
         return null;
     }
 
     @Override
-    public void deleteMedicoById() throws ValidationException {
+    public void deleteMedicoById(int id) throws ValidationException {
         return;
     }
     

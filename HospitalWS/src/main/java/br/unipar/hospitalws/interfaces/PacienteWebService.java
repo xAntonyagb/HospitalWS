@@ -10,18 +10,18 @@ import java.util.ArrayList;
 public interface PacienteWebService {
     
     @WebMethod()
-    PacienteModel insertPaciente() throws ValidationException;
+    PacienteModel insertPaciente(PacienteModel pacienteModel) throws ValidationException;
     
     @WebMethod()
-    ArrayList<PacienteModel> getPacienteById() throws ValidationException;
+    PacienteModel getPacienteById(int id) throws ValidationException;
     
     @WebMethod()
     ArrayList<PacienteModel> getAllPacientes() throws ValidationException;
     
     @WebMethod()
-    PacienteModel updatePaciente() throws ValidationException;
+    PacienteModel updatePaciente(PacienteModel pacienteModel) throws ValidationException;
     
     @WebMethod()
-    void deletePacienteById() throws ValidationException;
+    void deletePacienteById(PacienteModel pacienteModel) throws ValidationException;
     
 }

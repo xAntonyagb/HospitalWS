@@ -13,12 +13,12 @@ public class PacienteWebServiceImp implements PacienteWebService{
     private static PacienteService pacienteService = new PacienteService();
 
     @Override
-    public PacienteModel insertPaciente() throws ValidationException {
+    public PacienteModel insertPaciente(PacienteModel pacienteModel) throws ValidationException {
         return null;
     }
 
     @Override
-    public ArrayList<PacienteModel> getPacienteById() throws ValidationException {
+    public PacienteModel getPacienteById(int id) throws ValidationException {
         return null;
     }
 
@@ -28,12 +28,12 @@ public class PacienteWebServiceImp implements PacienteWebService{
     }
 
     @Override
-    public PacienteModel updatePaciente() throws ValidationException {
+    public PacienteModel updatePaciente(PacienteModel pacienteModel) throws ValidationException {
         return null;
     }
 
     @Override
-    public void deletePacienteById() throws ValidationException {
+    public void deletePacienteById(PacienteModel pacienteModel) throws ValidationException {
         return;
     }
     
