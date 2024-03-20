@@ -8,7 +8,7 @@ import javax.sql.DataSource;
 
 public class ConstructionFactory {
     
-    private static final String RESOURCE_NAME = "postegresResource";
+    private static final String RESOURCE_NAME = "postegresResource2";
     
     private DataSource getDataSource;
     
