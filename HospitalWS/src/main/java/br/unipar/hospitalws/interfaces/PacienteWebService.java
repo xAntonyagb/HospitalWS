@@ -22,6 +22,6 @@ public interface PacienteWebService {
     PacienteModel updatePaciente(PacienteModel pacienteModel) throws ValidationException;
     
     @WebMethod()
-    void deletePacienteById(PacienteModel pacienteModel) throws ValidationException;
+    void deletePacienteById(int id) throws ValidationException;
     
 }

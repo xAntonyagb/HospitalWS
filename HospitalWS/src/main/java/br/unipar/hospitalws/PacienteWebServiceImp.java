@@ -33,7 +33,7 @@ public class PacienteWebServiceImp implements PacienteWebService{
     }
 
     @Override
-    public void deletePacienteById(PacienteModel pacienteModel) throws ValidationException {
+    public void deletePacienteById(int id) throws ValidationException {
         return;
     }
     

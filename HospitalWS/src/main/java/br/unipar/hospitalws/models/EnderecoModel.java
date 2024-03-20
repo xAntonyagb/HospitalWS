@@ -1,6 +1,6 @@
 package br.unipar.hospitalws.models;
 
-class EnderecoModel {
+public class EnderecoModel {
     private String logradouro;
     private int numero;
     private String complemento;
@@ -49,6 +49,30 @@ class EnderecoModel {
 
     public void setBairro(String bairro) {
         this.bairro = bairro;
+    }
+
+    public String getCidade() {
+        return cidade;
+    }
+
+    public void setCidade(String cidade) {
+        this.cidade = cidade;
+    }
+
+    public String getUF() {
+        return UF;
+    }
+
+    public void setUF(String UF) {
+        this.UF = UF;
+    }
+
+    public String getCEP() {
+        return CEP;
+    }
+
+    public void setCEP(String CEP) {
+        this.CEP = CEP;
     }
 
     @Override
