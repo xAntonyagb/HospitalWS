@@ -19,11 +19,6 @@ public class EnderecoService {
                 || enderecoModel.getBairro() == null){
             throw new ValidationException("Bairro inválido! Porfavor informe algum bairro");
         }
-        if(enderecoModel.getComplemento().length() < 0
-                || enderecoModel.getComplemento().isEmpty()
-                || enderecoModel.getComplemento() == null){
-            throw new ValidationException("Complemento inválido! Porfavor informe algum complemento");
-        }
         if(enderecoModel.getLogradouro().length() < 0
                 || enderecoModel.getLogradouro().isEmpty()
                 || enderecoModel.getLogradouro() == null){
@@ -33,9 +28,6 @@ public class EnderecoService {
                 || enderecoModel.getUF().isEmpty()
                 || enderecoModel.getUF() == null){
             throw new ValidationException("UF inválida! Porfavor informe alguma UF");
-        }
-        if(enderecoModel.getNumero() == 0){
-            throw new ValidationException("Número inválido! Porfavor informe algum número");
         }
         if(enderecoModel.getCidade().length() < 0
                 || enderecoModel.getCidade().isEmpty()

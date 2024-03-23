@@ -19,6 +19,14 @@ public class EnderecoModel {
         this.CEP = CEP;
     }
 
+    public EnderecoModel(String logradouro, String bairro, String cidade, String UF, String CEP) {
+        this.logradouro = logradouro;
+        this.bairro = bairro;
+        this.cidade = cidade;
+        this.UF = UF;
+        this.CEP = CEP;
+    }
+
     public String getLogradouro() {
         return logradouro;
     }

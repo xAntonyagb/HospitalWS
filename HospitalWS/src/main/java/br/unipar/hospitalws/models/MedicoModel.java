@@ -2,50 +2,21 @@ package br.unipar.hospitalws.models;
 
 import br.unipar.hospitalws.enums.EspecialidadeEnum;
 
-public class MedicoModel {
-    private String nome;
-    private String gmail;
-    private String telefone;
+public class MedicoModel extends PessoaModel{
+    private int medicoId;
     private int CRM;
     private EspecialidadeEnum especialidade;
-    private EnderecoModel endereco;
-    private String cpf;
+    private boolean ativo;
 
     public MedicoModel() {
     }
 
-    public MedicoModel(String nome, String gmail, String telefone, int CRM, EspecialidadeEnum especialidade, EnderecoModel endereco, String cpf) {
-        this.nome = nome;
-        this.gmail = gmail;
-        this.telefone = telefone;
+    public MedicoModel(int medicoId, int CRM, EspecialidadeEnum especialidade, boolean ativo, String nome, String gmail, String telefone, EnderecoModel endereco, String cpf, int pessoaId) {
+        super(nome, gmail, telefone, endereco, cpf, pessoaId);
+        this.medicoId = medicoId;
         this.CRM = CRM;
         this.especialidade = especialidade;
-        this.endereco = endereco;
-        this.cpf = cpf;
-    }
-
-    public String getNome() {
-        return nome;
-    }
-
-    public void setNome(String nome) {
-        this.nome = nome;
-    }
-
-    public String getGmail() {
-        return gmail;
-    }
-
-    public void setGmail(String gmail) {
-        this.gmail = gmail;
-    }
-
-    public String getTelefone() {
-        return telefone;
-    }
-
-    public void setTelefone(String telefone) {
-        this.telefone = telefone;
+        this.ativo = ativo;
     }
 
     public int getCRM() {
@@ -64,26 +35,25 @@ public class MedicoModel {
         this.especialidade = especialidade;
     }
 
-    public EnderecoModel getEndereco() {
-        return endereco;
+    public int getMedicoId() {
+        return medicoId;
     }
 
-    public void setEndereco(EnderecoModel endereco) {
-        this.endereco = endereco;
+    public void setmedicoId(int medicoId) {
+        this.medicoId = medicoId;
     }
 
-    public String getCpf() {
-        return cpf;
+    public boolean isAtivo() {
+        return ativo;
     }
 
-    public void setCpf(String cpf) {
-        this.cpf = cpf;
+    public void setAtivo(boolean ativo) {
+        this.ativo = ativo;
     }
 
     @Override
     public String toString() {
-        return "MedicoModel{" + "nome=" + nome + ", gmail=" + gmail + ", telefone=" + telefone + ", CRM=" + CRM + ", especialidade=" + especialidade + ", endereco=" + endereco + ", cpf=" + cpf + '}';
+        return "MedicoModel{" + "medicoId=" + medicoId + ", CRM=" + CRM + ", especialidade=" + especialidade + ", ativo=" + ativo + '}';
     }
 
-    
 }

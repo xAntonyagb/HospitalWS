@@ -1,66 +1,28 @@
 package br.unipar.hospitalws.models;
 
-public class PacienteModel {
-    private String nome;
-    private String gmail;
-    private String telefone;
-    private EnderecoModel endereco;
-    private String cpf;
+public class PacienteModel extends PessoaModel{
+    
+    private int pacienteId;
 
-    public PacienteModel(String nome, String gmail, String telefone, EnderecoModel endereco, String cpf) {
-        this.nome = nome;
-        this.gmail = gmail;
-        this.telefone = telefone;
-        this.endereco = endereco;
-        this.cpf = cpf;
+    public PacienteModel(int pacienteId, String nome, String gmail, String telefone, EnderecoModel endereco, String cpf, int pessoaId) {
+        super(nome, gmail, telefone, endereco, cpf, pessoaId);
+        this.pacienteId = pessoaId;
+    }
+    public PacienteModel(int pacienteId) {
+        this.pacienteId = pacienteId;
     }
 
-    public PacienteModel() {
+    public int getPacienteId() {
+        return pacienteId;
     }
 
-    public String getNome() {
-        return nome;
-    }
-
-    public void setNome(String nome) {
-        this.nome = nome;
-    }
-
-    public String getGmail() {
-        return gmail;
-    }
-
-    public void setGmail(String gmail) {
-        this.gmail = gmail;
-    }
-
-    public String getTelefone() {
-        return telefone;
-    }
-
-    public void setTelefone(String telefone) {
-        this.telefone = telefone;
-    }
-
-    public EnderecoModel getEndereco() {
-        return endereco;
-    }
-
-    public void setEndereco(EnderecoModel endereco) {
-        this.endereco = endereco;
-    }
-
-    public String getCpf() {
-        return cpf;
-    }
-
-    public void setCpf(String cpf) {
-        this.cpf = cpf;
+    public void setPacienteId(int pacienteId) {
+        this.pacienteId = pacienteId;
     }
 
     @Override
     public String toString() {
-        return "PacienteModel{" + "nome=" + nome + ", gmail=" + gmail + ", telefone=" + telefone + ", endereco=" + endereco + ", cpf=" + cpf + '}';
+        return "PacienteModel{" + "pacienteId=" + pacienteId + super.toString() + '}';
     }
-    
+
 }
