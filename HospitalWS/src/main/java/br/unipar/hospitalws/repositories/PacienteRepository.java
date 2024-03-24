@@ -1,8 +1,9 @@
 package br.unipar.hospitalws.repositories;
 
+import br.unipar.hospitalws.exceptions.DataBaseException;
 import br.unipar.hospitalws.models.PacienteModel;
-import java.sql.Connection;
-import java.sql.SQLException;
+
+import java.sql.*;
 import java.util.ArrayList;
 
 public class PacienteRepository {
@@ -17,20 +18,21 @@ public class PacienteRepository {
     }
     
     public PacienteModel insertPaciente(PacienteModel pacienteModel) {
-        String sql = "";
-        
+        String sql = "INSERT INTO tb_paciente (id_pessoa, st_ativo) VALUES(?, ?)";
+
         return null;
     }
     
     public PacienteModel getPacienteById(int id) {
-        String sql = "";
+        String sql = "SELECT * FROM tb_paciente"
+                + "WHERE id = ?";
 
         
         return null;
     }
     
     public ArrayList<PacienteModel> getAllPacientes() {
-        String sql = "";
+        String sql = "SELECT * FROM tb_paciente";
 
         
         return null;
@@ -38,12 +40,13 @@ public class PacienteRepository {
     
     public PacienteModel updatePaciente(PacienteModel pacienteModel) {
         //Puxar metodo de update do PessoaRepository && manter return abaixo
-        
+        pessoaRepository.updatePessoa(pacienteModel);
         return pacienteModel;
     }
     
     public void alteraStPaciente(PacienteModel pacienteModel) throws SQLException{
-        //Deixar st_ativo como pacienteModel.get ...
+        String sql = "UPDATE tb_paciente SET st_ativo = ?" +
+                "WHERE id = ?";
     }
     
 }
