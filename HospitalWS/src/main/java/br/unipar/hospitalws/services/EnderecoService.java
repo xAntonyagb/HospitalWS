@@ -1,5 +1,6 @@
 package br.unipar.hospitalws.services;
 
+import br.unipar.hospitalws.exceptions.DataBaseException;
 import br.unipar.hospitalws.exceptions.ValidationException;
 import br.unipar.hospitalws.infrastructure.ConstructionFactory;
 import br.unipar.hospitalws.models.EnderecoModel;
@@ -10,8 +11,9 @@ import java.util.ArrayList;
 
 public class EnderecoService {
     
-    private final Connection connection = new ConstructionFactory().getConnection();
-    private final EnderecoRepository pacienteRepository = new EnderecoRepository(connection);
+    private ConstructionFactory constructionFactory = new ConstructionFactory();
+    private Connection connection = null;
+    private EnderecoRepository enderecoRepository = null;
     
     public static void validaEndereco(EnderecoModel enderecoModel) {
         if(enderecoModel.getBairro().length() < 0
@@ -42,23 +44,81 @@ public class EnderecoService {
     }
     
     
-    public EnderecoModel insertEndereco(EnderecoModel EnderecoModel) throws SQLException {
-        return pacienteRepository.insertEndereco(EnderecoModel);
+    public EnderecoModel insertEndereco(EnderecoModel enderecoModel) {
+        validaEndereco(enderecoModel);
+        EnderecoModel retorno = new EnderecoModel();
+        
+        try {
+        connection = constructionFactory.getConnection();
+        enderecoRepository = new EnderecoRepository(connection);
+        
+        retorno = enderecoRepository.insertEndereco(enderecoModel);
+        connection.close();
+        } catch (SQLException ex) {
+            throw new DataBaseException(ex.getMessage());
+        }
+        
+        return retorno;
     }
     
-    public EnderecoModel getEnderecoById(int id) throws SQLException{
-        return pacienteRepository.getEnderecoById(id);
+    public EnderecoModel getEnderecoById(int id) {
+        EnderecoModel retorno = new EnderecoModel();
+        
+        try {
+            connection = constructionFactory.getConnection();
+            enderecoRepository = new EnderecoRepository(connection);
+
+            retorno = enderecoRepository.getEnderecoById(id);
+            connection.close();
+        } catch (SQLException ex) {
+            throw new DataBaseException(ex.getMessage());
+        }
+        
+        return retorno;
     }
     
     public ArrayList<EnderecoModel> getAllEnderecos() {
-        return pacienteRepository.getAllEnderecos();
+        ArrayList<EnderecoModel> retorno = new ArrayList<EnderecoModel>();
+        
+        try {
+            connection = constructionFactory.getConnection();
+            enderecoRepository = new EnderecoRepository(connection);
+
+            retorno = enderecoRepository.getAllEnderecos();
+            connection.close();
+        } catch (SQLException ex) {
+            throw new DataBaseException(ex.getMessage());
+        }
+        
+        return retorno;
     }
     
-    public EnderecoModel updateEndereco(EnderecoModel EnderecoModel) throws SQLException{
-        return pacienteRepository.updateEndereco(EnderecoModel);
+    public EnderecoModel updateEndereco(EnderecoModel enderecoModel) {
+        validaEndereco(enderecoModel);
+        EnderecoModel retorno = new EnderecoModel();
+        
+        try {
+            connection = constructionFactory.getConnection();
+            enderecoRepository = new EnderecoRepository(connection);
+
+            retorno = enderecoRepository.updateEndereco(enderecoModel);
+            connection.close();
+        } catch (SQLException ex) {
+            throw new DataBaseException(ex.getMessage());
+        }
+        
+        return retorno;
     }
     
-    public void deleteEnderecoById(int id) throws SQLException{
-        pacienteRepository.deleteEnderecoById(id);
+    public void deleteEnderecoById(int id) {
+        try {
+            connection = constructionFactory.getConnection();
+            enderecoRepository = new EnderecoRepository(connection);
+
+            enderecoRepository.deleteEnderecoById(id);
+            connection.close();
+        } catch (SQLException ex) {
+            throw new DataBaseException(ex.getMessage());
+        }
     }
 }

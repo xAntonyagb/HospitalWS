@@ -1,5 +1,6 @@
 package br.unipar.hospitalws;
 
+import br.unipar.hospitalws.exceptions.DataBaseException;
 import br.unipar.hospitalws.exceptions.ValidationException;
 import br.unipar.hospitalws.interfaces.MedicoWebService;
 import br.unipar.hospitalws.models.MedicoModel;
@@ -13,27 +14,27 @@ public class MedicoWebServiceImp implements MedicoWebService{
     private static MedicoService medicoService = new MedicoService();
 
     @Override
-    public MedicoModel insertMedico(MedicoModel medicoModel) throws ValidationException {
+    public MedicoModel insertMedico(MedicoModel medicoModel) throws ValidationException, DataBaseException {
         return null;
     }
 
     @Override
-    public MedicoModel getMedicoById(int id) throws ValidationException {
+    public MedicoModel getMedicoById(int id) throws ValidationException, DataBaseException {
         return null;
     }
 
     @Override
-    public ArrayList<MedicoModel> getAllMedicos() throws ValidationException {
+    public ArrayList<MedicoModel> getAllMedicos() throws ValidationException, DataBaseException {
         return null;
     }
 
     @Override
-    public MedicoModel updateMedico(MedicoModel medicoModel) throws ValidationException {
+    public MedicoModel updateMedico(MedicoModel medicoModel) throws ValidationException, DataBaseException {
         return null;
     }
 
     @Override
-    public void deleteMedicoById(int id) throws ValidationException {
+    public void deleteMedicoById(int id) throws ValidationException, DataBaseException {
         return;
     }
     

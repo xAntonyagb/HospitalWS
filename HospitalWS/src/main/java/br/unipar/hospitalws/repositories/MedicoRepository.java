@@ -10,12 +10,9 @@ public class MedicoRepository {
 
     Connection connection;
     
-    public MedicoRepository(Connection connection) {
+    public MedicoRepository(Connection connection) throws SQLException {
         this.connection = connection;
-    }
-    
-    public MedicoModel getMedicoResultSet(ResultSet rs) { 
-        return null;
+        connection.setAutoCommit(false);
     }
     
     public MedicoModel insertMedico(MedicoModel medicoModel) throws SQLException {

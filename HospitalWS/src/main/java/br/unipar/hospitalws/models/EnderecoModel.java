@@ -8,8 +8,11 @@ public class EnderecoModel {
     private String cidade;
     private String UF;
     private String CEP;
+    private int idEndereco;
+    
+    public EnderecoModel() { }
 
-    public EnderecoModel(String logradouro, int numero, String complemento, String bairro, String cidade, String UF, String CEP) {
+    public EnderecoModel(String logradouro, int numero, String complemento, String bairro, String cidade, String UF, String CEP, int idEndereco) {
         this.logradouro = logradouro;
         this.numero = numero;
         this.complemento = complemento;
@@ -17,14 +20,7 @@ public class EnderecoModel {
         this.cidade = cidade;
         this.UF = UF;
         this.CEP = CEP;
-    }
-
-    public EnderecoModel(String logradouro, String bairro, String cidade, String UF, String CEP) {
-        this.logradouro = logradouro;
-        this.bairro = bairro;
-        this.cidade = cidade;
-        this.UF = UF;
-        this.CEP = CEP;
+        this.idEndereco = idEndereco;
     }
 
     public String getLogradouro() {
@@ -83,9 +79,18 @@ public class EnderecoModel {
         this.CEP = CEP;
     }
 
+    public int getIdEndereco() {
+        return idEndereco;
+    }
+
+    public void setIdEndereco(int idEndereco) {
+        this.idEndereco = idEndereco;
+    }
+
     @Override
     public String toString() {
-        return "EnderecoModel{" + "logradouro=" + logradouro + ", numero=" + numero + ", complemento=" + complemento + ", bairro=" + bairro + ", cidade=" + cidade + ", UF=" + UF + ", CEP=" + CEP + '}';
+        return "EnderecoModel{" + "logradouro=" + logradouro + ", numero=" + numero + ", complemento=" + complemento + ", bairro=" + bairro + ", cidade=" + cidade + ", UF=" + UF + ", CEP=" + CEP + ", idEndereco=" + idEndereco + '}';
     }
+
     
 }

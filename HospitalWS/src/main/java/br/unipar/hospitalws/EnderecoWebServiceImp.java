@@ -1,5 +1,6 @@
 package br.unipar.hospitalws;
 
+import br.unipar.hospitalws.exceptions.DataBaseException;
 import br.unipar.hospitalws.exceptions.ValidationException;
 import br.unipar.hospitalws.interfaces.EnderecoWebService;
 import br.unipar.hospitalws.models.EnderecoModel;
@@ -13,27 +14,27 @@ public class EnderecoWebServiceImp implements EnderecoWebService{
     private static EnderecoService pacienteService = new EnderecoService();
 
     @Override
-    public EnderecoModel insertEndereco(EnderecoModel pacienteModel) throws ValidationException {
+    public EnderecoModel insertEndereco(EnderecoModel pacienteModel) throws ValidationException, DataBaseException {
         return null;
     }
 
     @Override
-    public EnderecoModel getEnderecoById(int id) throws ValidationException {
+    public EnderecoModel getEnderecoById(int id) throws ValidationException, DataBaseException {
         return null;
     }
 
     @Override
-    public ArrayList<EnderecoModel> getAllEnderecos() throws ValidationException {
+    public ArrayList<EnderecoModel> getAllEnderecos() throws ValidationException, DataBaseException {
         return null;
     }
 
     @Override
-    public EnderecoModel updateEndereco(EnderecoModel pacienteModel) throws ValidationException {
+    public EnderecoModel updateEndereco(EnderecoModel pacienteModel) throws ValidationException, DataBaseException {
         return null;
     }
 
     @Override
-    public void deleteEnderecoById(int id) throws ValidationException {
+    public void deleteEnderecoById(int id) throws ValidationException, DataBaseException {
         return;
     }
     

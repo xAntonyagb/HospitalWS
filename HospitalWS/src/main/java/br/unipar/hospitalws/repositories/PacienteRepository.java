@@ -10,12 +10,9 @@ public class PacienteRepository {
 
     Connection connection;
     
-    public PacienteRepository(Connection connection) {
+    public PacienteRepository(Connection connection) throws SQLException {
         this.connection = connection;
-    }
-    
-    public PacienteModel getPacienteResultSet(ResultSet rs) { 
-        return null;
+        connection.setAutoCommit(false);
     }
     
     public PacienteModel insertPaciente(PacienteModel pacienteModel) throws SQLException {

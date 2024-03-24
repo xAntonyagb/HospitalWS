@@ -10,12 +10,9 @@ public class EnderecoRepository {
 
     Connection connection;
     
-    public EnderecoRepository(Connection connection) {
+    public EnderecoRepository(Connection connection) throws SQLException {
         this.connection = connection;
-    }
-    
-    public EnderecoModel getEnderecoResultSet(ResultSet rs) { 
-        return null;
+        connection.setAutoCommit(false);
     }
     
     public EnderecoModel insertEndereco(EnderecoModel pacienteModel) throws SQLException {

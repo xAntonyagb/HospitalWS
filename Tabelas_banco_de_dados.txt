@@ -1,0 +1,35 @@
+CREATE TABLE tb_endereco (
+    id SERIAL PRIMARY KEY,
+    numero VARCHAR(10),
+    complemento VARCHAR(100),
+    bairro VARCHAR(100) NOT NULL,
+    cidade VARCHAR(100) NOT NULL,
+    uf CHAR(2) NOT NULL,
+    cep VARCHAR(10) NOT NULL
+);
+
+CREATE TABLE tb_pessoa (
+    id SERIAL PRIMARY KEY NOT NULL,
+    nome VARCHAR(100) NOT NULL,
+    gmail VARCHAR(100) NOT NULL,
+    telefone VARCHAR(20) NOT NULL,
+    id_endereco INT NOT NULL,
+    cpf VARCHAR(14) NOT NULL,
+    FOREIGN KEY (id_endereco) REFERENCES tb_endereco(id)
+);
+
+CREATE TABLE tb_paciente (
+    id SERIAL PRIMARY KEY NOT NULL,
+    id_pessoa INT NOT NULL,
+    ativo BOOLEAN NOT NULL,
+    FOREIGN KEY (id_pessoa) REFERENCES tb_pessoa(id)
+);
+
+CREATE TABLE tb_medico (
+    id SERIAL PRIMARY KEY NOT NULL,
+    id_pessoa INT NOT NULL,
+    crm VARCHAR(20) NOT NULL,
+    especialidade CHAR(1) NOT NULL,
+    st_ativo BOOLEAN NOT NULL,
+    FOREIGN KEY (id_pessoa) REFERENCES tb_pessoa(id)
+);

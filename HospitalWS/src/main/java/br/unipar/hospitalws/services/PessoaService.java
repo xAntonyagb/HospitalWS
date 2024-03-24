@@ -1,9 +1,21 @@
 package br.unipar.hospitalws.services;
 
+import br.unipar.hospitalws.exceptions.DataBaseException;
 import br.unipar.hospitalws.exceptions.ValidationException;
+import br.unipar.hospitalws.infrastructure.ConstructionFactory;
 import br.unipar.hospitalws.models.PessoaModel;
+import br.unipar.hospitalws.repositories.PessoaRepository;
+import java.sql.Connection;
+import java.sql.SQLException;
+import java.util.ArrayList;
 
 public class PessoaService {
+    
+    private ConstructionFactory constructionFactory = new ConstructionFactory();
+    private Connection connection = null;
+    private PessoaRepository pessoaRepository = null;
+    
+    
     public static void validaPessoa(PessoaModel pessoa) {
         if(pessoa.getCpf().length() != 11) {
             throw new ValidationException("CPF inválido! Informe um CPF com 11 digitos");
@@ -24,8 +36,88 @@ public class PessoaService {
                 || pessoa.getTelefone() == null){
             throw new ValidationException("Telefone inválido! Porfavor informe um telefone válido");
         }
+    }
+    
+    public PessoaModel insertPessoa(PessoaModel pessoaModel, boolean validar) {
+        if(validar) {
+        validaPessoa(pessoaModel);
+        }
         
-        EnderecoService.validaEndereco(pessoa.getEndereco());
+        PessoaModel retorno = null;
+        try {
+            connection = constructionFactory.getConnection();
+            pessoaRepository = new PessoaRepository(connection);
+
+            retorno = pessoaRepository.insertPessoa(pessoaModel);
+            connection.close();
+        } catch (SQLException ex) {
+            throw new DataBaseException(ex.getMessage());
+        }
+        
+        return retorno;
+    }
+    
+    public PessoaModel getPessoaById(int id) {
+        PessoaModel retorno = null;
+        
+        try {
+            connection = constructionFactory.getConnection();
+            pessoaRepository = new PessoaRepository(connection);
+
+            retorno = pessoaRepository.getPessoaById(id);
+            connection.close();
+        } catch (SQLException ex) {
+            throw new DataBaseException(ex.getMessage());
+        }
+        
+        return retorno;
+    }
+    
+    public ArrayList<PessoaModel> getAllPessoas() {
+        ArrayList<PessoaModel> retorno = null;
+        
+        try {
+            connection = constructionFactory.getConnection();
+            pessoaRepository = new PessoaRepository(connection);
+
+            retorno = pessoaRepository.getAllPessoas();
+            connection.close();
+        } catch (SQLException ex) {
+            throw new DataBaseException(ex.getMessage());
+        }
+        
+        return retorno;
+    }
+    
+    public PessoaModel updatePessoa(PessoaModel pessoaModel, boolean validar) {
+        if(validar){
+            validaPessoa(pessoaModel);
+        }
+        
+        PessoaModel retorno = null;
+        try {
+            connection = constructionFactory.getConnection();
+            pessoaRepository = new PessoaRepository(connection);
+
+            retorno = pessoaRepository.updatePessoa(pessoaModel);
+            connection.close();
+        } catch (SQLException ex) {
+            throw new DataBaseException(ex.getMessage());
+        }
+        
+        return retorno;
+    }
+    
+    public void deletePessoaById(int id) {
+        try {
+            connection = constructionFactory.getConnection();
+            pessoaRepository = new PessoaRepository(connection);
+
+            pessoaRepository.deletePessoaById(id);
+            connection.close();
+        } catch (SQLException ex) {
+            throw new DataBaseException(ex.getMessage());
+        }
     }
     
     

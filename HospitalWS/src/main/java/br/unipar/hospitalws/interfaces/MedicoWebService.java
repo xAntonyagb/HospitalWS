@@ -1,5 +1,6 @@
 package br.unipar.hospitalws.interfaces;
 
+import br.unipar.hospitalws.exceptions.DataBaseException;
 import br.unipar.hospitalws.exceptions.ValidationException;
 import br.unipar.hospitalws.models.MedicoModel;
 import jakarta.jws.WebMethod;
@@ -10,18 +11,18 @@ import java.util.ArrayList;
 public interface MedicoWebService {
     
     @WebMethod()
-    MedicoModel insertMedico(MedicoModel medicoModel) throws ValidationException;
+    MedicoModel insertMedico(MedicoModel medicoModel) throws ValidationException, DataBaseException;
     
     @WebMethod()
-    MedicoModel getMedicoById(int id) throws ValidationException;
+    MedicoModel getMedicoById(int id) throws ValidationException, DataBaseException;
     
     @WebMethod()
-    ArrayList<MedicoModel> getAllMedicos() throws ValidationException;
+    ArrayList<MedicoModel> getAllMedicos() throws ValidationException, DataBaseException;
     
     @WebMethod()
-    MedicoModel updateMedico(MedicoModel medicoModel) throws ValidationException;
+    MedicoModel updateMedico(MedicoModel medicoModel) throws ValidationException, DataBaseException;
     
     @WebMethod()
-    void deleteMedicoById(int id) throws ValidationException;
+    void deleteMedicoById(int id) throws ValidationException, DataBaseException;
     
 }

@@ -1,5 +1,6 @@
 package br.unipar.hospitalws;
 
+import br.unipar.hospitalws.exceptions.DataBaseException;
 import br.unipar.hospitalws.exceptions.ValidationException;
 import br.unipar.hospitalws.interfaces.PacienteWebService;
 import br.unipar.hospitalws.models.PacienteModel;
@@ -13,27 +14,27 @@ public class PacienteWebServiceImp implements PacienteWebService{
     private static PacienteService pacienteService = new PacienteService();
 
     @Override
-    public PacienteModel insertPaciente(PacienteModel pacienteModel) throws ValidationException {
+    public PacienteModel insertPaciente(PacienteModel pacienteModel) throws ValidationException, DataBaseException {
         return null;
     }
 
     @Override
-    public PacienteModel getPacienteById(int id) throws ValidationException {
+    public PacienteModel getPacienteById(int id) throws ValidationException, DataBaseException {
         return null;
     }
 
     @Override
-    public ArrayList<PacienteModel> getAllPacientes() throws ValidationException {
+    public ArrayList<PacienteModel> getAllPacientes() throws ValidationException, DataBaseException {
         return null;
     }
 
     @Override
-    public PacienteModel updatePaciente(PacienteModel pacienteModel) throws ValidationException {
+    public PacienteModel updatePaciente(PacienteModel pacienteModel) throws ValidationException, DataBaseException {
         return null;
     }
 
     @Override
-    public void deletePacienteById(int id) throws ValidationException {
+    public void deletePacienteById(int id) throws ValidationException, DataBaseException {
         return;
     }
     

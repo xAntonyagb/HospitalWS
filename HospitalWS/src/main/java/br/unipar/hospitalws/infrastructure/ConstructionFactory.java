@@ -1,6 +1,7 @@
 package br.unipar.hospitalws.infrastructure;
 
 import java.sql.Connection;
+import java.sql.SQLException;
 import javax.naming.Context;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
@@ -24,5 +25,13 @@ public class ConstructionFactory {
             System.out.println(ex.getMessage());
         }
     return null;
+    }
+    
+    public void rollback(Connection connection) {
+        try {
+            connection.rollback();
+        } catch (SQLException ex) {
+           System.out.println(ex.getMessage()); 
+        }
     }
 }
