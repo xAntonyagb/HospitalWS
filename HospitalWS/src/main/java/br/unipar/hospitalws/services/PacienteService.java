@@ -2,7 +2,7 @@ package br.unipar.hospitalws.services;
 
 import br.unipar.hospitalws.exceptions.DataBaseException;
 import br.unipar.hospitalws.exceptions.ValidationException;
-import br.unipar.hospitalws.infrastructure.ConstructionFactory;
+import br.unipar.hospitalws.infrastructure.ConnectionFactory;
 import br.unipar.hospitalws.models.EnderecoModel;
 import br.unipar.hospitalws.models.PacienteModel;
 import br.unipar.hospitalws.repositories.PacienteRepository;
@@ -12,7 +12,7 @@ import java.util.ArrayList;
 
 public class PacienteService {
     
-    private ConstructionFactory constructionFactory = new ConstructionFactory();
+    private ConnectionFactory connectionFactory = new ConnectionFactory();
     private Connection connection = null;
     private PacienteRepository pacienteRepository = null;
     private PessoaService pessoaService = new PessoaService();
@@ -29,14 +29,14 @@ public class PacienteService {
                     .getPessoaId();
             pacienteModel.setPessoaId(idPessoa);
 
-            connection = constructionFactory.getConnection();
+            connection = connectionFactory.getConnection();
             pacienteRepository = new PacienteRepository(connection);
 
             retorno = pacienteRepository.insertPaciente(pacienteModel);
             connection.commit();
         } 
         catch (SQLException ex) {
-            constructionFactory.rollback(connection);
+            connectionFactory.rollback(connection);
             throw new DataBaseException(ex.getMessage());
         } 
         finally {
@@ -57,7 +57,7 @@ public class PacienteService {
         PacienteModel retorno = new PacienteModel();
         
         try {
-            connection = constructionFactory.getConnection();
+            connection = connectionFactory.getConnection();
             pacienteRepository = new PacienteRepository(connection);
 
             retorno = pacienteRepository.getPacienteById(id);
@@ -84,7 +84,7 @@ public class PacienteService {
         ArrayList<PacienteModel> retorno = new ArrayList<PacienteModel>();
         
         try {
-            connection = constructionFactory.getConnection();
+            connection = connectionFactory.getConnection();
             pacienteRepository = new PacienteRepository(connection);
 
             retorno = pacienteRepository.getAllPacientes();
@@ -114,10 +114,10 @@ public class PacienteService {
             EnderecoModel enderecoRetorno = enderecoService.updateEndereco(pacienteModel.getEndereco());
             pacienteModel.setEndereco(enderecoRetorno);
 
-            if(pacienteModel.getCpf() != null) {
+            if(!pacienteModel.getCpf().equals("?") && !pacienteModel.getCpf().isEmpty()) {
                 throw new ValidationException("Não se pode atualizar o cpf de um paciente!");
             }
-            if(pacienteModel.getGmail() != null){
+            if(!pacienteModel.getGmail().equals("?") && !pacienteModel.getGmail().isEmpty()){
                 throw new ValidationException("Não se pode atualizar o e-mail de um paciente!");
             }
 
@@ -133,18 +133,18 @@ public class PacienteService {
                 throw new ValidationException("Telefone inválido! Porfavor informe um telefone válido");
             }
 
-            int idPessoa = pessoaService.insertPessoa(pacienteModel, false)
+            int idPessoa = pessoaService.updatePessoa(pacienteModel, false)
                     .getPessoaId();
             pacienteModel.setPessoaId(idPessoa);
 
-            connection = constructionFactory.getConnection();
+            connection = connectionFactory.getConnection();
             pacienteRepository = new PacienteRepository(connection);
 
             retorno = pacienteRepository.updatePaciente(pacienteModel);
             connection.commit();
         } 
         catch (SQLException ex) {
-            constructionFactory.rollback(connection);
+            connectionFactory.rollback(connection);
             throw new DataBaseException(ex.getMessage());
         } 
         finally {
@@ -163,7 +163,7 @@ public class PacienteService {
     
     public void alteraStPaciente(PacienteModel pacienteModel) {
          try {
-            connection = constructionFactory.getConnection();
+            connection = connectionFactory.getConnection();
             pacienteRepository = new PacienteRepository(connection);
 
             pacienteRepository.alteraStPaciente(pacienteModel);

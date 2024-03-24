@@ -4,17 +4,17 @@ CREATE TABLE tb_endereco (
     complemento VARCHAR(100),
     bairro VARCHAR(100) NOT NULL,
     cidade VARCHAR(100) NOT NULL,
-    uf CHAR(2) NOT NULL,
+    uf VARCHAR(20) NOT NULL,
     cep VARCHAR(10) NOT NULL
 );
 
 CREATE TABLE tb_pessoa (
     id SERIAL PRIMARY KEY NOT NULL,
     nome VARCHAR(100) NOT NULL,
-    gmail VARCHAR(100) NOT NULL,
+    gmail VARCHAR(100),
     telefone VARCHAR(20) NOT NULL,
     id_endereco INT NOT NULL,
-    cpf VARCHAR(14) NOT NULL,
+    cpf VARCHAR(11),
     FOREIGN KEY (id_endereco) REFERENCES tb_endereco(id)
 );
 

@@ -2,7 +2,7 @@ package br.unipar.hospitalws.services;
 
 import br.unipar.hospitalws.exceptions.DataBaseException;
 import br.unipar.hospitalws.exceptions.ValidationException;
-import br.unipar.hospitalws.infrastructure.ConstructionFactory;
+import br.unipar.hospitalws.infrastructure.ConnectionFactory;
 import br.unipar.hospitalws.models.PessoaModel;
 import br.unipar.hospitalws.repositories.PessoaRepository;
 import java.sql.Connection;
@@ -11,7 +11,7 @@ import java.util.ArrayList;
 
 public class PessoaService {
     
-    private ConstructionFactory constructionFactory = new ConstructionFactory();
+    private ConnectionFactory connectionFactory = new ConnectionFactory();
     private Connection connection = null;
     private PessoaRepository pessoaRepository = null;
     
@@ -45,7 +45,7 @@ public class PessoaService {
         
         PessoaModel retorno = null;
         try {
-            connection = constructionFactory.getConnection();
+            connection = connectionFactory.getConnection();
             pessoaRepository = new PessoaRepository(connection);
 
             retorno = pessoaRepository.insertPessoa(pessoaModel);
@@ -61,7 +61,7 @@ public class PessoaService {
         PessoaModel retorno = null;
         
         try {
-            connection = constructionFactory.getConnection();
+            connection = connectionFactory.getConnection();
             pessoaRepository = new PessoaRepository(connection);
 
             retorno = pessoaRepository.getPessoaById(pessoaModel);
@@ -77,7 +77,7 @@ public class PessoaService {
         ArrayList<PessoaModel> retorno = null;
         
         try {
-            connection = constructionFactory.getConnection();
+            connection = connectionFactory.getConnection();
             pessoaRepository = new PessoaRepository(connection);
 
             retorno = pessoaRepository.getAllPessoas();
@@ -96,7 +96,7 @@ public class PessoaService {
         
         PessoaModel retorno = null;
         try {
-            connection = constructionFactory.getConnection();
+            connection = connectionFactory.getConnection();
             pessoaRepository = new PessoaRepository(connection);
 
             retorno = pessoaRepository.updatePessoa(pessoaModel);
@@ -110,7 +110,7 @@ public class PessoaService {
     
     public void deletePessoaById(int id) {
         try {
-            connection = constructionFactory.getConnection();
+            connection = connectionFactory.getConnection();
             pessoaRepository = new PessoaRepository(connection);
 
             pessoaRepository.deletePessoaById(id);

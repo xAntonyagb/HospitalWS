@@ -127,6 +127,7 @@ public class EnderecoRepository {
             ps.setString(4, enderecoModel.getCidade());
             ps.setString(5, enderecoModel.getUF());
             ps.setString(6, enderecoModel.getCEP());
+            ps.setInt(7, enderecoModel.getIdEndereco());
             
             ps.executeUpdate();
         } catch (SQLException ex) {

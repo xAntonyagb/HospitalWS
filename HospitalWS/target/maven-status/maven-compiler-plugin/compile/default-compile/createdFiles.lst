@@ -1,10 +1,10 @@
+br\unipar\hospitalws\infrastructure\ConnectionFactory.class
 br\unipar\hospitalws\repositories\PacienteRepository.class
 br\unipar\hospitalws\services\PacienteService.class
 br\unipar\hospitalws\models\EnderecoModel.class
 br\unipar\hospitalws\services\PessoaService.class
 br\unipar\hospitalws\services\EnderecoService.class
 br\unipar\hospitalws\services\MedicoService.class
-br\unipar\hospitalws\infrastructure\ConstructionFactory.class
 br\unipar\hospitalws\exceptions\DataBaseException.class
 br\unipar\hospitalws\interfaces\PacienteWebService.class
 br\unipar\hospitalws\interfaces\MedicoWebService.class

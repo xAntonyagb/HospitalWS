@@ -31,6 +31,7 @@ public class PacienteRepository {
             rs = ps.getGeneratedKeys();
 
             rs.next();
+            pacienteModel.setPacienteId(rs.getInt(1));
 
 
         } catch (SQLException ex) {
@@ -40,7 +41,7 @@ public class PacienteRepository {
     }
     
     public PacienteModel getPacienteById(int id) {
-        String sql = "SELECT * FROM tb_paciente"
+        String sql = "SELECT * FROM tb_paciente "
                 + "WHERE id = ?";
         PreparedStatement ps = null;
         ResultSet rs = null;
@@ -59,9 +60,6 @@ public class PacienteRepository {
              throw new DataBaseException(ex.getMessage());
          }
 
-
-
-        
         return null;
     }
     
@@ -95,7 +93,7 @@ public class PacienteRepository {
     }
     
     public void alteraStPaciente(PacienteModel pacienteModel) throws SQLException{
-        String sql = "UPDATE tb_paciente SET st_ativo = ?" +
+        String sql = "UPDATE tb_paciente SET st_ativo = ? " +
                 "WHERE id = ?";
         PreparedStatement ps = null;
         try {

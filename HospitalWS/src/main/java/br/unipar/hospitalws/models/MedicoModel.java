@@ -18,6 +18,10 @@ public class MedicoModel extends PessoaModel{
         this.especialidade = especialidade;
         this.ativo = ativo;
     }
+    
+    public MedicoModel(int medicoId) {
+        this.medicoId = medicoId;
+    }
 
     public String getCRM() {
         return CRM;
@@ -39,7 +43,7 @@ public class MedicoModel extends PessoaModel{
         return medicoId;
     }
 
-    public void setmedicoId(int medicoId) {
+    public void setMedicoId(int medicoId) {
         this.medicoId = medicoId;
     }
 

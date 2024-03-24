@@ -50,7 +50,7 @@ public class PessoaRepository {
     }
     
     public PessoaModel getPessoaById(PessoaModel pessoaModel) {
-        String sql = "SELECT *  FROM tb_pessoa WHERE id = ? LIMIT 1"; 
+        String sql = "SELECT *  FROM tb_pessoa WHERE id = ?"; 
         PreparedStatement ps = null;
         ResultSet rs = null;
         
@@ -105,7 +105,7 @@ public class PessoaRepository {
     }
     
     public PessoaModel updatePessoa(PessoaModel pessoaModel) {
-        String sql = "UPDATE tb_pessoa SET nome = ?, telefone = ? WHERE id = ? LIMIT 1";
+        String sql = "UPDATE tb_pessoa SET nome = ?, telefone = ? WHERE id = ?";
         PreparedStatement ps = null;
         
         try {
@@ -113,7 +113,7 @@ public class PessoaRepository {
             
             ps.setString(1, pessoaModel.getNome());
             ps.setString(2, pessoaModel.getTelefone());
-            ps.setInt(3, pessoaModel.getEndereco().getIdEndereco());
+            ps.setInt(3, pessoaModel.getPessoaId());
             enderecoRepository.updateEndereco(pessoaModel.getEndereco());
             
             ps.executeUpdate();
@@ -125,7 +125,7 @@ public class PessoaRepository {
     }
     
     public void deletePessoaById(int id) {
-        String sql = "DELETE FROM tb_pessoa WHERE id = ? LIMIT 1";
+        String sql = "DELETE FROM tb_pessoa WHERE id = ?";
         PreparedStatement ps = null;
         
         try {

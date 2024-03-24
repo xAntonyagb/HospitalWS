@@ -22,8 +22,8 @@ public class MedicoRepository {
     }
     
     public MedicoModel insertMedico(MedicoModel medicoModel) {
-        String sql = "INSERT INTO tb_medico (id_pessoa, crm, especialidade) "
-                + "VALUES (?, ?, ?) ";
+        String sql = "INSERT INTO tb_medico (id_pessoa, crm, especialidade, st_ativo) "
+                + "VALUES (?, ?, ?, ?) ";
         
         PreparedStatement ps = null;
         ResultSet rs = null;
@@ -33,12 +33,13 @@ public class MedicoRepository {
             ps.setInt(1, medicoModel.getPessoaId());
             ps.setString(2, medicoModel.getCRM());
             ps.setString(3, medicoModel.getEspecialidade().getCodigo());
+            ps.setBoolean(4, true);
             ps.executeUpdate();
             
             rs = ps.getGeneratedKeys();
             
             rs.next();
-            medicoModel.setPessoaId(rs.getInt(1));
+            medicoModel.setMedicoId(rs.getInt(1));
             
             
         } catch (SQLException ex) {
@@ -63,7 +64,7 @@ public class MedicoRepository {
             rs = ps.executeQuery();
             
             while(rs.next()) {
-                medico.setmedicoId(rs.getInt(1));
+                medico.setMedicoId(rs.getInt(1));
                 medico.setPessoaId(rs.getInt(2));
                 medico.setCRM(rs.getString(3));
                 medico.setEspecialidade(EspecialidadeEnum.getEnumByCodigo(rs.getString(4)));
@@ -92,7 +93,7 @@ public class MedicoRepository {
             while(rs.next()) {
                 MedicoModel medico = new MedicoModel();
                 
-                medico.setmedicoId(rs.getInt(1));
+                medico.setMedicoId(rs.getInt(1));
                 medico.setPessoaId(rs.getInt(2));
                 medico.setCRM(rs.getString(3));
                 medico.setEspecialidade(EspecialidadeEnum.getEnumByCodigo(rs.getString(4)));

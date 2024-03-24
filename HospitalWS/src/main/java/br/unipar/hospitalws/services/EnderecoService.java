@@ -2,7 +2,7 @@ package br.unipar.hospitalws.services;
 
 import br.unipar.hospitalws.exceptions.DataBaseException;
 import br.unipar.hospitalws.exceptions.ValidationException;
-import br.unipar.hospitalws.infrastructure.ConstructionFactory;
+import br.unipar.hospitalws.infrastructure.ConnectionFactory;
 import br.unipar.hospitalws.models.EnderecoModel;
 import br.unipar.hospitalws.repositories.EnderecoRepository;
 import java.sql.Connection;
@@ -11,7 +11,7 @@ import java.util.ArrayList;
 
 public class EnderecoService {
     
-    private ConstructionFactory constructionFactory = new ConstructionFactory();
+    private ConnectionFactory connectionFactory = new ConnectionFactory();
     private Connection connection = null;
     private EnderecoRepository enderecoRepository = null;
     
@@ -49,7 +49,7 @@ public class EnderecoService {
         EnderecoModel retorno = new EnderecoModel();
         
         try {
-        connection = constructionFactory.getConnection();
+        connection = connectionFactory.getConnection();
         enderecoRepository = new EnderecoRepository(connection);
         
         retorno = enderecoRepository.insertEndereco(enderecoModel);
@@ -65,7 +65,7 @@ public class EnderecoService {
         EnderecoModel retorno = new EnderecoModel();
         
         try {
-            connection = constructionFactory.getConnection();
+            connection = connectionFactory.getConnection();
             enderecoRepository = new EnderecoRepository(connection);
 
             retorno = enderecoRepository.getEnderecoById(id);
@@ -81,7 +81,7 @@ public class EnderecoService {
         ArrayList<EnderecoModel> retorno = new ArrayList<EnderecoModel>();
         
         try {
-            connection = constructionFactory.getConnection();
+            connection = connectionFactory.getConnection();
             enderecoRepository = new EnderecoRepository(connection);
 
             retorno = enderecoRepository.getAllEnderecos();
@@ -98,7 +98,7 @@ public class EnderecoService {
         EnderecoModel retorno = new EnderecoModel();
         
         try {
-            connection = constructionFactory.getConnection();
+            connection = connectionFactory.getConnection();
             enderecoRepository = new EnderecoRepository(connection);
 
             retorno = enderecoRepository.updateEndereco(enderecoModel);
@@ -112,7 +112,7 @@ public class EnderecoService {
     
     public void deleteEnderecoById(int id) {
         try {
-            connection = constructionFactory.getConnection();
+            connection = connectionFactory.getConnection();
             enderecoRepository = new EnderecoRepository(connection);
 
             enderecoRepository.deleteEnderecoById(id);

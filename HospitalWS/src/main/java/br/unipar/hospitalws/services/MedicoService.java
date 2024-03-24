@@ -2,7 +2,7 @@ package br.unipar.hospitalws.services;
 
 import br.unipar.hospitalws.exceptions.DataBaseException;
 import br.unipar.hospitalws.exceptions.ValidationException;
-import br.unipar.hospitalws.infrastructure.ConstructionFactory;
+import br.unipar.hospitalws.infrastructure.ConnectionFactory;
 import br.unipar.hospitalws.models.EnderecoModel;
 import br.unipar.hospitalws.models.MedicoModel;
 import br.unipar.hospitalws.repositories.MedicoRepository;
@@ -12,7 +12,7 @@ import java.util.ArrayList;
 
 public class MedicoService {
     
-    private ConstructionFactory constructionFactory = new ConstructionFactory();
+    private ConnectionFactory constructionFactory = new ConnectionFactory();
     private Connection connection = null;
     private MedicoRepository medicoRepository = null;
     private PessoaService pessoaService = new PessoaService();;
@@ -121,16 +121,16 @@ public class MedicoService {
         MedicoModel retorno = new MedicoModel();
         
         try {
-            EnderecoModel enderecoRetorno = enderecoService.insertEndereco(medicoModel.getEndereco());
+            EnderecoModel enderecoRetorno = enderecoService.updateEndereco(medicoModel.getEndereco());
             medicoModel.setEndereco(enderecoRetorno);
 
-            if(medicoModel.getGmail() != null) {
+            if(!medicoModel.getGmail().equals("?") && !medicoModel.getGmail().equals("")) {
                 throw new ValidationException("Você não pode atualizar o email de um médico!");
             }
-            if(medicoModel.getEspecialidade()!= null) {
+            if(medicoModel.getEspecialidade() != null) {
                 throw new ValidationException("Você não pode atualizar a especialidade de um médico!");
             }
-            if(medicoModel.getCRM() != null) {
+            if(!medicoModel.getCRM().equals("?") && !medicoModel.getCRM().isEmpty()) {
                 throw new ValidationException("Você não pode atualizar o CRM de um médico!");
             }
             
@@ -149,7 +149,7 @@ public class MedicoService {
                 throw new ValidationException("Telefone inválido! Porfavor informe um telefone válido");
             }
             
-            int idPessoa = pessoaService.insertPessoa(medicoModel, false)
+            int idPessoa = pessoaService.updatePessoa(medicoModel, false)
                     .getPessoaId();
             medicoModel.setPessoaId(idPessoa);
             
@@ -179,7 +179,7 @@ public class MedicoService {
     
     public void alteraStMedico(MedicoModel medicoModel) {
         try {
-            connection = constructionFactory.getConnection();
+            connection = new ConnectionFactory().getConnection();
             medicoRepository = new MedicoRepository(connection);
 
             medicoRepository.alteraStMedico(medicoModel);

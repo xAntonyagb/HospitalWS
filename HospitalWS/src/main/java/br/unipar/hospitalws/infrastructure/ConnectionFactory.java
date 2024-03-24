@@ -7,9 +7,9 @@ import javax.naming.InitialContext;
 import javax.naming.NamingException;
 import javax.sql.DataSource;
 
-public class ConstructionFactory {
+public class ConnectionFactory {
     
-    private static final String RESOURCE_NAME = "postgresResource2";
+    private static final String RESOURCE_NAME = "postegresResource2";
     
     private DataSource getDataSource;
     
@@ -23,8 +23,8 @@ public class ConstructionFactory {
             return getDatasource().getConnection();
         } catch (Exception ex) {
             System.out.println(ex.getMessage());
-        }
-    return null;
+        } 
+        return null;
     }
     
     public void rollback(Connection connection) {
