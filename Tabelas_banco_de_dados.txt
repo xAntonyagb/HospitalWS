@@ -21,7 +21,7 @@ CREATE TABLE tb_pessoa (
 CREATE TABLE tb_paciente (
     id SERIAL PRIMARY KEY NOT NULL,
     id_pessoa INT NOT NULL,
-    ativo BOOLEAN NOT NULL,
+    st_ativo BOOLEAN NOT NULL,
     FOREIGN KEY (id_pessoa) REFERENCES tb_pessoa(id)
 );
 

@@ -61,6 +61,7 @@ public class PacienteService {
             pacienteRepository = new PacienteRepository(connection);
 
             retorno = pacienteRepository.getPacienteById(id);
+            connection.commit();
             
         } catch (SQLException ex) {
             throw new DataBaseException(ex.getMessage());
@@ -87,6 +88,7 @@ public class PacienteService {
             pacienteRepository = new PacienteRepository(connection);
 
             retorno = pacienteRepository.getAllPacientes();
+            connection.commit();
             
         } catch (SQLException ex) {
             throw new DataBaseException(ex.getMessage());
@@ -159,12 +161,12 @@ public class PacienteService {
         return retorno;
     }
     
-    public void deletePacienteById(int id) {
+    public void alteraStPaciente(PacienteModel pacienteModel) {
          try {
             connection = constructionFactory.getConnection();
             pacienteRepository = new PacienteRepository(connection);
 
-            pacienteRepository.deletePacienteById(id);
+            pacienteRepository.alteraStPaciente(pacienteModel);
             
         } catch (SQLException ex) {
             throw new DataBaseException(ex.getMessage());

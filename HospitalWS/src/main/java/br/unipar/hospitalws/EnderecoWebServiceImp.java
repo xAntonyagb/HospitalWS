@@ -15,27 +15,27 @@ public class EnderecoWebServiceImp implements EnderecoWebService{
 
     @Override
     public EnderecoModel insertEndereco(EnderecoModel pacienteModel) throws ValidationException, DataBaseException {
-        return null;
+        return pacienteService.insertEndereco(pacienteModel);
     }
 
     @Override
     public EnderecoModel getEnderecoById(int id) throws ValidationException, DataBaseException {
-        return null;
+        return pacienteService.getEnderecoById(id);
     }
 
     @Override
     public ArrayList<EnderecoModel> getAllEnderecos() throws ValidationException, DataBaseException {
-        return null;
+        return pacienteService.getAllEnderecos();
     }
 
     @Override
     public EnderecoModel updateEndereco(EnderecoModel pacienteModel) throws ValidationException, DataBaseException {
-        return null;
+        return pacienteService.updateEndereco(pacienteModel);
     }
 
     @Override
     public void deleteEnderecoById(int id) throws ValidationException, DataBaseException {
-        return;
+        pacienteService.deleteEnderecoById(id);
     }
     
 }

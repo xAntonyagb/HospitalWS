@@ -15,27 +15,27 @@ public class MedicoWebServiceImp implements MedicoWebService{
 
     @Override
     public MedicoModel insertMedico(MedicoModel medicoModel) throws ValidationException, DataBaseException {
-        return null;
+        return medicoService.insertMedico(medicoModel);
     }
 
     @Override
     public MedicoModel getMedicoById(int id) throws ValidationException, DataBaseException {
-        return null;
+        return medicoService.getMedicoById(id);
     }
 
     @Override
     public ArrayList<MedicoModel> getAllMedicos() throws ValidationException, DataBaseException {
-        return null;
+        return medicoService.getAllMedicos();
     }
 
     @Override
     public MedicoModel updateMedico(MedicoModel medicoModel) throws ValidationException, DataBaseException {
-        return null;
+        return medicoService.updateMedico(medicoModel);
     }
 
     @Override
-    public void deleteMedicoById(int id) throws ValidationException, DataBaseException {
-        return;
+    public void alteraStMedico(MedicoModel medicoModel) throws ValidationException, DataBaseException {
+        medicoService.alteraStMedico(medicoModel);
     }
     
 }

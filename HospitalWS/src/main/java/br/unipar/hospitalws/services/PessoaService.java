@@ -57,14 +57,14 @@ public class PessoaService {
         return retorno;
     }
     
-    public PessoaModel getPessoaById(int id) {
+    public PessoaModel getPessoaById(PessoaModel pessoaModel) {
         PessoaModel retorno = null;
         
         try {
             connection = constructionFactory.getConnection();
             pessoaRepository = new PessoaRepository(connection);
 
-            retorno = pessoaRepository.getPessoaById(id);
+            retorno = pessoaRepository.getPessoaById(pessoaModel);
             connection.close();
         } catch (SQLException ex) {
             throw new DataBaseException(ex.getMessage());

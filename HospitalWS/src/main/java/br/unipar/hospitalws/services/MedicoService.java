@@ -177,12 +177,12 @@ public class MedicoService {
         return retorno;
     }
     
-    public void deleteMedicoById(int id) {
+    public void alteraStMedico(MedicoModel medicoModel) {
         try {
             connection = constructionFactory.getConnection();
             medicoRepository = new MedicoRepository(connection);
 
-            medicoRepository.deleteMedicoById(id);
+            medicoRepository.alteraStMedico(medicoModel);
             connection.commit();
         } 
         catch (SQLException ex) {

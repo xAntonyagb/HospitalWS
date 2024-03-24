@@ -15,27 +15,27 @@ public class PacienteWebServiceImp implements PacienteWebService{
 
     @Override
     public PacienteModel insertPaciente(PacienteModel pacienteModel) throws ValidationException, DataBaseException {
-        return null;
+        return pacienteService.insertPaciente(pacienteModel);
     }
 
     @Override
     public PacienteModel getPacienteById(int id) throws ValidationException, DataBaseException {
-        return null;
+        return pacienteService.getPacienteById(id);
     }
 
     @Override
     public ArrayList<PacienteModel> getAllPacientes() throws ValidationException, DataBaseException {
-        return null;
+        return pacienteService.getAllPacientes();
     }
 
     @Override
     public PacienteModel updatePaciente(PacienteModel pacienteModel) throws ValidationException, DataBaseException {
-        return null;
+        return pacienteService.updatePaciente(pacienteModel);
     }
 
     @Override
-    public void deletePacienteById(int id) throws ValidationException, DataBaseException {
-        return;
+    public void alteraStPaciente(PacienteModel pacienteModel) throws ValidationException, DataBaseException {
+        pacienteService.alteraStPaciente(pacienteModel);
     }
     
 }
