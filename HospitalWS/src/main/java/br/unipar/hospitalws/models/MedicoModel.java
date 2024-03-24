@@ -4,14 +4,14 @@ import br.unipar.hospitalws.enums.EspecialidadeEnum;
 
 public class MedicoModel extends PessoaModel{
     private int medicoId;
-    private int CRM;
+    private String CRM;
     private EspecialidadeEnum especialidade;
     private boolean ativo;
 
     public MedicoModel() {
     }
 
-    public MedicoModel(int medicoId, int CRM, EspecialidadeEnum especialidade, boolean ativo, String nome, String gmail, String telefone, EnderecoModel endereco, String cpf, int pessoaId) {
+    public MedicoModel(int medicoId, String CRM, EspecialidadeEnum especialidade, boolean ativo, String nome, String gmail, String telefone, EnderecoModel endereco, String cpf, int pessoaId) {
         super(nome, gmail, telefone, endereco, cpf, pessoaId);
         this.medicoId = medicoId;
         this.CRM = CRM;
@@ -19,11 +19,11 @@ public class MedicoModel extends PessoaModel{
         this.ativo = ativo;
     }
 
-    public int getCRM() {
+    public String getCRM() {
         return CRM;
     }
 
-    public void setCRM(int CRM) {
+    public void setCRM(String CRM) {
         this.CRM = CRM;
     }
 

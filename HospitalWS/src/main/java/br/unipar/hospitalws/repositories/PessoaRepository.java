@@ -113,7 +113,7 @@ public class PessoaRepository {
             
             ps.setString(1, pessoaModel.getNome());
             ps.setString(2, pessoaModel.getTelefone());
-            ps.setLong(3, pessoaModel.getEndereco().getIdEndereco());
+            ps.setInt(3, pessoaModel.getEndereco().getIdEndereco());
             enderecoRepository.updateEndereco(pessoaModel.getEndereco());
             
             ps.executeUpdate();

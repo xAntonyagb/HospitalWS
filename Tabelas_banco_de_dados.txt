@@ -1,6 +1,6 @@
 CREATE TABLE tb_endereco (
     id SERIAL PRIMARY KEY,
-    numero VARCHAR(10),
+    numero INT(10),
     complemento VARCHAR(100),
     bairro VARCHAR(100) NOT NULL,
     cidade VARCHAR(100) NOT NULL,

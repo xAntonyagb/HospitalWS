@@ -30,7 +30,7 @@ public class MedicoService {
             medicoModel.setPessoaId(idPessoa);
 
             
-            if(Integer.toString(medicoModel.getCRM()).length() != 12) {
+            if(medicoModel.getCRM().length() != 12) {
                 throw new ValidationException("CRM inválido! Informe um CRM com 12 digitos");
             }
             if(medicoModel.getEspecialidade() == null){
@@ -130,7 +130,7 @@ public class MedicoService {
             if(medicoModel.getEspecialidade()!= null) {
                 throw new ValidationException("Você não pode atualizar a especialidade de um médico!");
             }
-            if(medicoModel.getCRM() != 0) {
+            if(medicoModel.getCRM() != null) {
                 throw new ValidationException("Você não pode atualizar o CRM de um médico!");
             }
             

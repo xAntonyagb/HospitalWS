@@ -15,8 +15,8 @@ public class PacienteService {
     private ConstructionFactory constructionFactory = new ConstructionFactory();
     private Connection connection = null;
     private PacienteRepository pacienteRepository = null;
-    private PessoaService pessoaService = new PessoaService();;
-    private EnderecoService enderecoService = new EnderecoService();;
+    private PessoaService pessoaService = new PessoaService();
+    private EnderecoService enderecoService = new EnderecoService();
     
     public PacienteModel insertPaciente(PacienteModel pacienteModel) {
         PacienteModel retorno = new PacienteModel();
