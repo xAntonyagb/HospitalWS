@@ -87,9 +87,26 @@ public class PacienteRepository {
     }
     
     public PacienteModel updatePaciente(PacienteModel pacienteModel) {
-            pessoaRepository.updatePessoa(pacienteModel);
+        String sql = "SELECT id_pessoa FROM tb_paciente WHERE id = ?";
+        PreparedStatement ps = null;
+        ResultSet rs = null;
+        
+        try {
+            ps = connection.prepareStatement(sql);
+            ps.setInt(1, pacienteModel.getPacienteId());
+            rs = ps.executeQuery();
+            
+            if (rs.next()) {
+                pacienteModel.setPessoaId(rs.getInt(1));
+            }
+            
+        } catch (SQLException ex) {
+            throw new DataBaseException(ex.getMessage());
+        }
+        
+        pessoaRepository.updatePessoa(pacienteModel);
 
-          return pacienteModel;
+        return pacienteModel;
     }
     
     public void alteraStPaciente(PacienteModel pacienteModel) throws SQLException{

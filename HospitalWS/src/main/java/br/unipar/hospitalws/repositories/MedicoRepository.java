@@ -110,6 +110,24 @@ public class MedicoRepository {
     }
     
     public MedicoModel updateMedico(MedicoModel medicoModel) {
+        String sql = "SELECT id_pessoa FROM tb_medico WHERE id = ?";
+        PreparedStatement ps = null;
+        ResultSet rs = null;
+        
+        try {
+            ps = connection.prepareStatement(sql);
+            ps.setInt(1, medicoModel.getMedicoId());
+            rs = ps.executeQuery();
+            
+            if (rs.next()) {
+                medicoModel.setPessoaId(rs.getInt(1));
+            }
+            
+        } catch (SQLException ex) {
+            throw new DataBaseException(ex.getMessage());
+        }
+        
+        
         pessoaRepository.updatePessoa(medicoModel);
         return medicoModel;
     }
