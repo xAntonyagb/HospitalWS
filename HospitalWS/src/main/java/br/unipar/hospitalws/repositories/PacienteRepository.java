@@ -109,14 +109,14 @@ public class PacienteRepository {
         return pacienteModel;
     }
     
-    public void alteraStPaciente(PacienteModel pacienteModel) throws SQLException{
+    public void desativaPaciente(int id) throws SQLException{
         String sql = "UPDATE tb_paciente SET st_ativo = ? " +
                 "WHERE id = ?";
         PreparedStatement ps = null;
         try {
             ps = connection.prepareStatement(sql);
-            ps.setBoolean(1, pacienteModel.isAtivo());
-            ps.setInt(2, pacienteModel.getPacienteId());
+            ps.setBoolean(1, false);
+            ps.setInt(2, id);
             ps.executeUpdate();
         } catch (SQLException ex) {
             throw new DataBaseException(ex.getMessage());

@@ -34,8 +34,8 @@ public class MedicoWebServiceImp implements MedicoWebService{
     }
 
     @Override
-    public void alteraStMedico(MedicoModel medicoModel) throws ValidationException, DataBaseException {
-        medicoService.alteraStMedico(medicoModel);
+    public void desativaMedico(int id) throws ValidationException, DataBaseException {
+        medicoService.desativaMedico(id);
     }
     
 }

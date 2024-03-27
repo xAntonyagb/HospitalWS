@@ -34,8 +34,8 @@ public class PacienteWebServiceImp implements PacienteWebService{
     }
 
     @Override
-    public void alteraStPaciente(PacienteModel pacienteModel) throws ValidationException, DataBaseException {
-        pacienteService.alteraStPaciente(pacienteModel);
+    public void desativaPaciente(int id) throws ValidationException, DataBaseException {
+        pacienteService.desativaPaciente(id);
     }
     
 }

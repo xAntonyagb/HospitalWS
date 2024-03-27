@@ -23,6 +23,6 @@ public interface PacienteWebService {
     PacienteModel updatePaciente(PacienteModel pacienteModel) throws ValidationException, DataBaseException;
     
     @WebMethod()
-    void alteraStPaciente(PacienteModel pacienteModel) throws ValidationException, DataBaseException;
+    void desativaPaciente(int id) throws ValidationException, DataBaseException;
     
 }

@@ -161,12 +161,12 @@ public class PacienteService {
         return retorno;
     }
     
-    public void alteraStPaciente(PacienteModel pacienteModel) {
+    public void desativaPaciente(int id) {
          try {
             connection = connectionFactory.getConnection();
             pacienteRepository = new PacienteRepository(connection);
 
-            pacienteRepository.alteraStPaciente(pacienteModel);
+            pacienteRepository.desativaPaciente(id);
             
         } catch (SQLException ex) {
             throw new DataBaseException(ex.getMessage());

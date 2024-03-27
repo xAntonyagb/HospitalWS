@@ -23,6 +23,6 @@ public interface MedicoWebService {
     MedicoModel updateMedico(MedicoModel medicoModel) throws ValidationException, DataBaseException;
     
     @WebMethod()
-    void alteraStMedico(MedicoModel medicoModel) throws ValidationException, DataBaseException;
+    void desativaMedico(int id) throws ValidationException, DataBaseException;
     
 }

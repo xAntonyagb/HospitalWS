@@ -132,7 +132,7 @@ public class MedicoRepository {
         return medicoModel;
     }
     
-    public void alteraStMedico(MedicoModel medicoModel) {
+    public void desativaMedico(int id) {
         String sql = "UPDATE tb_medico SET st_ativo = ? "
                 + "WHERE id = ? ";
         
@@ -141,8 +141,8 @@ public class MedicoRepository {
         try {
             ps = connection.prepareStatement(sql);
             
-            ps.setBoolean(1, medicoModel.isAtivo());
-            ps.setInt(2, medicoModel.getMedicoId());
+            ps.setBoolean(1, false);
+            ps.setInt(2, id);
             
             ps.executeUpdate();
         } catch (SQLException ex) {
