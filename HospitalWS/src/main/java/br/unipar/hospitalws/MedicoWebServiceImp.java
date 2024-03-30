@@ -1,9 +1,9 @@
 package br.unipar.hospitalws;
 
+import br.unipar.hospitalws.DTO.MedicoDTO;
 import br.unipar.hospitalws.exceptions.DataBaseException;
 import br.unipar.hospitalws.exceptions.ValidationException;
 import br.unipar.hospitalws.interfaces.MedicoWebService;
-import br.unipar.hospitalws.models.MedicoModel;
 import br.unipar.hospitalws.services.MedicoService;
 import jakarta.jws.WebService;
 import java.util.ArrayList;
@@ -14,28 +14,28 @@ public class MedicoWebServiceImp implements MedicoWebService{
     private static MedicoService medicoService = new MedicoService();
 
     @Override
-    public MedicoModel insertMedico(MedicoModel medicoModel) throws ValidationException, DataBaseException {
-        return medicoService.insertMedico(medicoModel);
+    public MedicoDTO insertMedico(MedicoDTO medico) throws ValidationException, DataBaseException {
+        return medicoService.insertMedico(medico);
     }
 
     @Override
-    public MedicoModel getMedicoById(int id) throws ValidationException, DataBaseException {
+    public MedicoDTO getMedicoById(int id) throws ValidationException, DataBaseException {
         return medicoService.getMedicoById(id);
     }
 
     @Override
-    public ArrayList<MedicoModel> getAllMedicos() throws ValidationException, DataBaseException {
+    public ArrayList<MedicoDTO> getAllMedicos() throws ValidationException, DataBaseException {
         return medicoService.getAllMedicos();
     }
 
     @Override
-    public MedicoModel updateMedico(MedicoModel medicoModel) throws ValidationException, DataBaseException {
-        return medicoService.updateMedico(medicoModel);
+    public MedicoDTO updateMedico(MedicoDTO medico) throws ValidationException, DataBaseException {
+        return medicoService.updateMedico(medico);
     }
 
     @Override
-    public void desativaMedico(int id) throws ValidationException, DataBaseException {
-        medicoService.desativaMedico(id);
+    public MedicoDTO desativaMedico(int id) throws ValidationException, DataBaseException {
+        return medicoService.desativaMedico(id);
     }
     
 }

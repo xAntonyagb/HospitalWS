@@ -1,8 +1,8 @@
-package br.unipar.hospitalws.models;
+package br.unipar.hospitalws.DTO;
 
-import br.unipar.hospitalws.DTO.EnderecoDTO;
+import br.unipar.hospitalws.models.EnderecoModel;
 
-public class EnderecoModel {
+public class EnderecoDTO {
     private String logradouro;
     private String numero;
     private String complemento;
@@ -10,11 +10,12 @@ public class EnderecoModel {
     private String cidade;
     private String UF;
     private String CEP;
-    private int idEndereco;
-    
-    public EnderecoModel() { }
+    private int id;
 
-    public EnderecoModel(String logradouro, String numero, String complemento, String bairro, String cidade, String UF, String CEP, int idEndereco) {
+    public EnderecoDTO() {
+    }
+
+    public EnderecoDTO(String logradouro, String numero, String complemento, String bairro, String cidade, String UF, String CEP, int id) {
         this.logradouro = logradouro;
         this.numero = numero;
         this.complemento = complemento;
@@ -22,27 +23,28 @@ public class EnderecoModel {
         this.cidade = cidade;
         this.UF = UF;
         this.CEP = CEP;
-        this.idEndereco = idEndereco;
+        this.id = id;
     }
     
-     public static EnderecoModel enderecoModelMapper(EnderecoDTO enderecoDTO) {
-         if (enderecoDTO == null) {
+    
+    public static EnderecoDTO enderecoDTOMapper(EnderecoModel enderecoModel) {
+        if (enderecoModel == null) {
             return null;
         }
-         
-        EnderecoModel enderecoModel = new EnderecoModel();
-        enderecoModel.setBairro(enderecoDTO.getBairro());
-        enderecoModel.setCEP(enderecoDTO.getCEP());
-        enderecoModel.setCidade(enderecoDTO.getCidade());
-        enderecoModel.setComplemento(enderecoDTO.getComplemento());
-        enderecoModel.setIdEndereco(enderecoDTO.getId());
-        enderecoModel.setLogradouro(enderecoDTO.getLogradouro());
-        enderecoModel.setNumero(enderecoDTO.getNumero());
-        enderecoModel.setUF(enderecoDTO.getUF());
         
-        return enderecoModel;
+        EnderecoDTO enderecoDTO = new EnderecoDTO();
+        enderecoDTO.setBairro(enderecoModel.getBairro());
+        enderecoDTO.setCEP(enderecoModel.getCEP());
+        enderecoDTO.setCidade(enderecoModel.getCidade());
+        enderecoDTO.setComplemento(enderecoModel.getComplemento());
+        enderecoDTO.setId(enderecoModel.getIdEndereco());
+        enderecoDTO.setLogradouro(enderecoModel.getLogradouro());
+        enderecoDTO.setNumero(enderecoModel.getNumero());
+        enderecoDTO.setUF(enderecoModel.getUF());
+        
+        return enderecoDTO;
     }
-
+    
     //Getters e setters
     public String getLogradouro() {
         return logradouro;
@@ -100,18 +102,17 @@ public class EnderecoModel {
         this.CEP = CEP;
     }
 
-    public int getIdEndereco() {
-        return idEndereco;
+    public int getId() {
+        return id;
     }
 
-    public void setIdEndereco(int idEndereco) {
-        this.idEndereco = idEndereco;
+    public void setId(int id) {
+        this.id = id;
     }
 
     @Override
     public String toString() {
-        return "EnderecoModel{" + "logradouro=" + logradouro + ", numero=" + numero + ", complemento=" + complemento + ", bairro=" + bairro + ", cidade=" + cidade + ", UF=" + UF + ", CEP=" + CEP + ", idEndereco=" + idEndereco + '}';
+        return "EnderecoDTO{" + "logradouro=" + logradouro + ", numero=" + numero + ", complemento=" + complemento + ", bairro=" + bairro + ", cidade=" + cidade + ", UF=" + UF + ", CEP=" + CEP + ", id=" + id + '}';
     }
-
     
 }

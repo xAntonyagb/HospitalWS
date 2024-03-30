@@ -15,7 +15,6 @@ public class EnderecoRepository {
     
     public EnderecoRepository(Connection connection) throws SQLException {
         this.connection = connection;
-        connection.setAutoCommit(false);
     }
     
     public EnderecoModel insertEndereco(EnderecoModel enderecoModel) {
@@ -27,7 +26,7 @@ public class EnderecoRepository {
         
         try {
             ps = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
-            ps.setInt(1, enderecoModel.getNumero());
+            ps.setString(1, enderecoModel.getNumero());
             ps.setString(2, enderecoModel.getComplemento());
             ps.setString(3, enderecoModel.getBairro());
             ps.setString(4, enderecoModel.getCidade());
@@ -54,28 +53,30 @@ public class EnderecoRepository {
         
         PreparedStatement ps = null;
         ResultSet rs = null;
-        EnderecoModel endereco = new EnderecoModel();
         
         try {
             ps = connection.prepareStatement(sql);
             ps.setInt(1, id);
             rs = ps.executeQuery();
             
-            while(rs.next()) {
+            if(rs.next()) {
+                EnderecoModel endereco = new EnderecoModel();
                 endereco.setIdEndereco(rs.getInt(1));
-                endereco.setNumero(rs.getInt(2));
+                endereco.setNumero(rs.getString(2));
                 endereco.setComplemento(rs.getString(3));
                 endereco.setBairro(rs.getString(4));
                 endereco.setCidade(rs.getString(5));
                 endereco.setUF(rs.getString(6));
                 endereco.setCEP(rs.getString(7));
+                
+                return endereco;
             }
             
         } catch (SQLException ex) {
             throw new DataBaseException(ex.getMessage());
         }
         
-        return endereco;
+        return null;
     }
     
     public ArrayList<EnderecoModel> getAllEnderecos() {
@@ -94,7 +95,7 @@ public class EnderecoRepository {
                 EnderecoModel endereco = new EnderecoModel();
                 
                 endereco.setIdEndereco(rs.getInt(1));
-                endereco.setNumero(rs.getInt(2));
+                endereco.setNumero(rs.getString(2));
                 endereco.setComplemento(rs.getString(3));
                 endereco.setBairro(rs.getString(4));
                 endereco.setCidade(rs.getString(5));
@@ -121,7 +122,7 @@ public class EnderecoRepository {
         try {
             ps = connection.prepareStatement(sql);
             
-            ps.setInt(1, enderecoModel.getNumero());
+            ps.setString(1, enderecoModel.getNumero());
             ps.setString(2, enderecoModel.getComplemento());
             ps.setString(3, enderecoModel.getBairro());
             ps.setString(4, enderecoModel.getCidade());
@@ -137,22 +138,24 @@ public class EnderecoRepository {
         return enderecoModel;
     }
     
-    public void deleteEnderecoById(int id) {
+    public int deleteEnderecoById(int id) {
         String sql = "DELETE FROM tb_endereco "
                 + "WHERE id = ?";
         
         PreparedStatement ps = null;
+        int retorno;
         
         try {
             ps = connection.prepareStatement(sql);
             ps.setInt(1, id);
 
-            ps.executeUpdate();
+            retorno = ps.executeUpdate();
             connection.commit();
         } catch (SQLException ex) {
             throw new DataBaseException(ex.getMessage());
         }
         
+        return retorno;
     }
     
 }

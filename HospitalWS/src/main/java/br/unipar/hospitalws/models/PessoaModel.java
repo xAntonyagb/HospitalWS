@@ -6,15 +6,15 @@ public abstract class PessoaModel {
     private String telefone;
     private EnderecoModel endereco;
     private String cpf;
-    private int pessoaId;
+    private int idPessoa;
 
-    public PessoaModel(String nome, String gmail, String telefone, EnderecoModel endereco, String cpf, int pessoaId) {
+    public PessoaModel(String nome, String gmail, String telefone, EnderecoModel endereco, String cpf, int idPessoa) {
         this.nome = nome;
         this.gmail = gmail;
         this.telefone = telefone;
         this.endereco = endereco;
         this.cpf = cpf;
-        this.pessoaId = pessoaId;
+        this.idPessoa = idPessoa;
     }
 
     public PessoaModel() {
@@ -60,17 +60,17 @@ public abstract class PessoaModel {
         this.cpf = cpf;
     }
 
-    public int getPessoaId() {
-        return pessoaId;
+    public int getIdPessoa() {
+        return idPessoa;
     }
 
-    public void setPessoaId(int pessoaId) {
-        this.pessoaId = pessoaId;
+    public void setIdPessoa(int pessoaId) {
+        this.idPessoa = pessoaId;
     }
 
     @Override
     public String toString() {
-        return "PessoaModel{" + "nome=" + nome + ", gmail=" + gmail + ", telefone=" + telefone + ", endereco=" + endereco + ", cpf=" + cpf + ", pessoaId=" + pessoaId + '}';
+        return "PessoaModel{" + "nome=" + nome + ", gmail=" + gmail + ", telefone=" + telefone + ", endereco=" + endereco + ", cpf=" + cpf + ", idPessoa=" + idPessoa + '}';
     }
 
     

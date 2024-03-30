@@ -1,5 +1,6 @@
 package br.unipar.hospitalws.infrastructure;
 
+import br.unipar.hospitalws.exceptions.DataBaseException;
 import java.sql.Connection;
 import java.sql.SQLException;
 import javax.naming.Context;
@@ -19,19 +20,29 @@ public class ConnectionFactory {
     }
     
     public Connection getConnection() {
+        Connection retorno = null;
         try {
-            return getDatasource().getConnection();
+            retorno = getDatasource().getConnection();
         } catch (Exception ex) {
-            System.out.println(ex.getMessage());
+            throw new DataBaseException(ex.getMessage());
         } 
-        return null;
+        
+        return retorno;
     }
     
     public void rollback(Connection connection) {
         try {
             connection.rollback();
         } catch (SQLException ex) {
-           System.out.println(ex.getMessage()); 
+           throw new DataBaseException(ex.getMessage());
+        }
+    }
+    
+    public void closeConnection(Connection connection) {
+        try {
+            connection.close();
+        } catch (SQLException ex) {
+            throw new DataBaseException(ex.getMessage());
         }
     }
 }

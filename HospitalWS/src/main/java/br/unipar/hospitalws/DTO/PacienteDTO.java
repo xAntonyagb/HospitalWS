@@ -1,5 +1,8 @@
 package br.unipar.hospitalws.DTO;
 
+import br.unipar.hospitalws.models.EnderecoModel;
+import br.unipar.hospitalws.models.PacienteModel;
+
 public class PacienteDTO {
     private int id;
     private boolean ativo;
@@ -10,14 +13,14 @@ public class PacienteDTO {
     private String cpf;
     
     private String logradouro;
-    private int numero;
+    private String numero;
     private String complemento;
     private String bairro;
     private String cidade;
     private String UF;
     private String CEP;
 
-    public PacienteDTO(int id, boolean ativo, String nome, String gmail, String telefone, String cpf, String logradouro, int numero, String complemento, String bairro, String cidade, String UF, String CEP) {
+    public PacienteDTO(int id, boolean ativo, String nome, String gmail, String telefone, String cpf, String logradouro, String numero, String complemento, String bairro, String cidade, String UF, String CEP) {
         this.id = id;
         this.ativo = ativo;
         this.nome = nome;
@@ -33,6 +36,35 @@ public class PacienteDTO {
         this.CEP = CEP;
     }
 
+    public static PacienteDTO pacienteDTOMapper(PacienteModel pacienteModel) {
+        if (pacienteModel == null) {
+            return null;
+        }
+
+        PacienteDTO pacienteDTO = new PacienteDTO();
+        EnderecoModel endereco = pacienteModel.getEndereco();
+
+        if(endereco != null) {
+            pacienteDTO.setBairro(endereco.getBairro());
+            pacienteDTO.setCEP(endereco.getCEP());
+            pacienteDTO.setUF(endereco.getUF());
+            pacienteDTO.setNumero(endereco.getNumero());
+            pacienteDTO.setLogradouro(endereco.getLogradouro());
+            pacienteDTO.setComplemento(endereco.getComplemento());
+            pacienteDTO.setCidade(endereco.getCidade());
+        }
+
+        pacienteDTO.setId(pacienteModel.getIdPaciente());
+        pacienteDTO.setAtivo(pacienteModel.isAtivo());
+        pacienteDTO.setCpf(pacienteModel.getCpf());
+        pacienteDTO.setGmail(pacienteModel.getGmail());
+        pacienteDTO.setNome(pacienteModel.getNome());
+        pacienteDTO.setTelefone(pacienteModel.getTelefone());
+
+        return pacienteDTO;
+    }
+    
+    //Getters e setters
     public PacienteDTO() {
     }
 
@@ -92,11 +124,11 @@ public class PacienteDTO {
         this.logradouro = logradouro;
     }
 
-    public int getNumero() {
+    public String getNumero() {
         return numero;
     }
 
-    public void setNumero(int numero) {
+    public void setNumero(String numero) {
         this.numero = numero;
     }
 

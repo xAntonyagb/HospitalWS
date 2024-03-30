@@ -1,6 +1,8 @@
 package br.unipar.hospitalws.DTO;
 
 import br.unipar.hospitalws.enums.EspecialidadeEnum;
+import br.unipar.hospitalws.models.EnderecoModel;
+import br.unipar.hospitalws.models.MedicoModel;
 
 public class MedicoDTO {
     private int id;
@@ -14,14 +16,14 @@ public class MedicoDTO {
     private String cpf;
     
     private String logradouro;
-    private int numero;
+    private String numero;
     private String complemento;
     private String bairro;
     private String cidade;
     private String UF;
     private String CEP;
 
-    public MedicoDTO(int id, String CRM, EspecialidadeEnum especialidade, boolean ativo, String nome, String gmail, String telefone, String cpf, String logradouro, int numero, String complemento, String bairro, String cidade, String UF, String CEP) {
+    public MedicoDTO(int id, String CRM, EspecialidadeEnum especialidade, boolean ativo, String nome, String gmail, String telefone, String cpf, String logradouro, String numero, String complemento, String bairro, String cidade, String UF, String CEP) {
         this.id = id;
         this.CRM = CRM;
         this.especialidade = especialidade;
@@ -42,6 +44,38 @@ public class MedicoDTO {
     public MedicoDTO() {
     }
 
+    
+    public static MedicoDTO medicoDTOMapper(MedicoModel medicoModel) {
+        if (medicoModel == null) {
+            return null;
+        }
+
+        MedicoDTO medicoDTO = new MedicoDTO();
+        EnderecoModel endereco = medicoModel.getEndereco();
+        
+        if(endereco != null) {
+            medicoDTO.setBairro(endereco.getBairro());
+            medicoDTO.setCEP(endereco.getCEP());
+            medicoDTO.setUF(endereco.getUF());
+            medicoDTO.setNumero(endereco.getNumero());
+            medicoDTO.setLogradouro(endereco.getLogradouro());
+            medicoDTO.setComplemento(endereco.getComplemento());
+            medicoDTO.setCidade(endereco.getCidade());
+        }
+        
+        medicoDTO.setId(medicoModel.getIdMedico());
+        medicoDTO.setAtivo(medicoModel.isAtivo());
+        medicoDTO.setCRM(medicoModel.getCRM());
+        medicoDTO.setEspecialidade(medicoModel.getEspecialidade());
+        medicoDTO.setCpf(medicoModel.getCpf());
+        medicoDTO.setGmail(medicoModel.getGmail());
+        medicoDTO.setNome(medicoModel.getNome());
+        medicoDTO.setTelefone(medicoModel.getTelefone());
+
+        return medicoDTO;
+    }
+    
+    //Getter e setters
     public int getId() {
         return id;
     }
@@ -114,11 +148,11 @@ public class MedicoDTO {
         this.logradouro = logradouro;
     }
 
-    public int getNumero() {
+    public String getNumero() {
         return numero;
     }
 
-    public void setNumero(int numero) {
+    public void setNumero(String numero) {
         this.numero = numero;
     }
 

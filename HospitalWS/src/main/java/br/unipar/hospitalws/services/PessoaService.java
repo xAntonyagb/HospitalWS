@@ -18,40 +18,38 @@ public class PessoaService {
     
     public static void validaPessoa(PessoaModel pessoa) {
         if(pessoa.getCpf().length() != 11) {
-            throw new ValidationException("CPF inválido! Informe um CPF com 11 digitos");
+            throw new ValidationException("CPF inválido! Informe um CPF com 11 digitos ("+ pessoa.getCpf().length() +")");
         }
-        if(pessoa.getNome().length() < 0
-                || pessoa.getNome().isEmpty()
-                || pessoa.getNome() == null){
+        if(pessoa.getNome() == null){
             throw new ValidationException("Nome inválido! Porfavor informe algum nome");
         }
-        if(pessoa.getGmail().length() < 0
-                || pessoa.getGmail().isEmpty()
-                || pessoa.getGmail() == null){
+        if(pessoa.getGmail() == null){
             throw new ValidationException("E-mail inválido! Porfavor informe algum e-mail");
         }
-        if(pessoa.getTelefone().length() < 0
-                || pessoa.getTelefone().length() < 9
-                || pessoa.getTelefone().isEmpty()
-                || pessoa.getTelefone() == null){
-            throw new ValidationException("Telefone inválido! Porfavor informe um telefone válido");
+        if(pessoa.getTelefone().length() < 9 || pessoa.getTelefone() == null){
+            throw new ValidationException("Telefone inválido! Porfavor informe um telefone com 9 digitos ("+ pessoa.getTelefone().length() +")");
         }
     }
     
     public PessoaModel insertPessoa(PessoaModel pessoaModel, boolean validar) {
         if(validar) {
-        validaPessoa(pessoaModel);
+            validaPessoa(pessoaModel);
         }
         
         PessoaModel retorno = null;
         try {
             connection = connectionFactory.getConnection();
+            connection.setAutoCommit(false);
             pessoaRepository = new PessoaRepository(connection);
 
             retorno = pessoaRepository.insertPessoa(pessoaModel);
-            connection.close();
-        } catch (SQLException ex) {
+        } 
+        catch (SQLException ex) {
             throw new DataBaseException(ex.getMessage());
+        } 
+        finally {
+            if(connection != null)
+                connectionFactory.closeConnection(connection);
         }
         
         return retorno;
@@ -62,12 +60,17 @@ public class PessoaService {
         
         try {
             connection = connectionFactory.getConnection();
+            connection.setAutoCommit(false);
             pessoaRepository = new PessoaRepository(connection);
 
             retorno = pessoaRepository.getPessoaById(pessoaModel);
-            connection.close();
-        } catch (SQLException ex) {
+        } 
+        catch (SQLException ex) {
             throw new DataBaseException(ex.getMessage());
+        }
+        finally {
+            if(connection != null)
+                connectionFactory.closeConnection(connection);
         }
         
         return retorno;
@@ -78,12 +81,16 @@ public class PessoaService {
         
         try {
             connection = connectionFactory.getConnection();
+            connection.setAutoCommit(false);
             pessoaRepository = new PessoaRepository(connection);
 
             retorno = pessoaRepository.getAllPessoas();
-            connection.close();
         } catch (SQLException ex) {
             throw new DataBaseException(ex.getMessage());
+        }
+        finally {
+            if(connection != null)
+                connectionFactory.closeConnection(connection);
         }
         
         return retorno;
@@ -97,12 +104,16 @@ public class PessoaService {
         PessoaModel retorno = null;
         try {
             connection = connectionFactory.getConnection();
+            connection.setAutoCommit(false);
             pessoaRepository = new PessoaRepository(connection);
 
             retorno = pessoaRepository.updatePessoa(pessoaModel);
-            connection.close();
         } catch (SQLException ex) {
             throw new DataBaseException(ex.getMessage());
+        }
+        finally {
+            if(connection != null)
+                connectionFactory.closeConnection(connection);
         }
         
         return retorno;
@@ -111,14 +122,18 @@ public class PessoaService {
     public void deletePessoaById(int id) {
         try {
             connection = connectionFactory.getConnection();
+            connection.setAutoCommit(false);
             pessoaRepository = new PessoaRepository(connection);
 
             pessoaRepository.deletePessoaById(id);
-            connection.close();
-        } catch (SQLException ex) {
+        } 
+        catch (SQLException ex) {
             throw new DataBaseException(ex.getMessage());
         }
+        finally {
+            if(connection != null)
+                connectionFactory.closeConnection(connection);
+        }
     }
-    
     
 }

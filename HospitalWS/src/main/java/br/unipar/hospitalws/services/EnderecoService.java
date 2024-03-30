@@ -1,10 +1,12 @@
 package br.unipar.hospitalws.services;
 
+import br.unipar.hospitalws.DTO.EnderecoDTO;
 import br.unipar.hospitalws.exceptions.DataBaseException;
 import br.unipar.hospitalws.exceptions.ValidationException;
 import br.unipar.hospitalws.infrastructure.ConnectionFactory;
 import br.unipar.hospitalws.models.EnderecoModel;
 import br.unipar.hospitalws.repositories.EnderecoRepository;
+import br.unipar.hospitalws.utils.StringValidatorUtil;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -16,109 +18,156 @@ public class EnderecoService {
     private EnderecoRepository enderecoRepository = null;
     
     public static void validaEndereco(EnderecoModel enderecoModel) {
-        if(enderecoModel.getBairro().length() < 0
-                || enderecoModel.getBairro().isEmpty()
-                || enderecoModel.getBairro() == null){
+        if(enderecoModel.getBairro() == null){
             throw new ValidationException("Bairro inválido! Porfavor informe algum bairro");
         }
-        if(enderecoModel.getLogradouro().length() < 0
-                || enderecoModel.getLogradouro().isEmpty()
-                || enderecoModel.getLogradouro() == null){
+        if(enderecoModel.getLogradouro() == null){
             throw new ValidationException("Logradouro inválido! Porfavor informe algum logradouro");
         }
-        if(enderecoModel.getUF().length() < 1
-                || enderecoModel.getUF().isEmpty()
-                || enderecoModel.getUF() == null){
+        if(enderecoModel.getUF() == null){
             throw new ValidationException("UF inválida! Porfavor informe alguma UF");
         }
-        if(enderecoModel.getCidade().length() < 0
-                || enderecoModel.getCidade().isEmpty()
-                || enderecoModel.getCidade() == null){
+        if(enderecoModel.getCidade() == null){
             throw new ValidationException("Cidade inválida! Porfavor informe alguma cidade");
         }
-        if(enderecoModel.getCEP().length() < 0
-                || enderecoModel.getCEP().isEmpty()
-                || enderecoModel.getCEP() == null){
+        if(enderecoModel.getCEP() == null){
             throw new ValidationException("CEP inválido! Porfavor informe algum CEP");
+        }
+        if(enderecoModel.getCEP().length() > 10) {
+            throw new ValidationException("CEP inválido! Informe um CEP de no máximo 10 digitos");
         }
     }
     
+    private EnderecoModel ajustaEndereco(EnderecoDTO endereco) {
+        endereco.setBairro(StringValidatorUtil.ajustaNormalInput(endereco.getBairro()));
+        endereco.setLogradouro(StringValidatorUtil.ajustaNormalInput(endereco.getLogradouro()));
+        endereco.setUF(StringValidatorUtil.ajustaNormalInput(endereco.getUF()));
+        endereco.setCidade(StringValidatorUtil.ajustaNormalInput(endereco.getCidade()));
+        endereco.setCEP(StringValidatorUtil.ajustaNormalInput(endereco.getCEP()));
+        endereco.setComplemento(StringValidatorUtil.ajustaNormalInput(endereco.getComplemento()));
+        endereco.setNumero(StringValidatorUtil.ajustaNumberInput(endereco.getNumero()));
+        
+        return EnderecoModel.enderecoModelMapper(endereco);
+    }
     
-    public EnderecoModel insertEndereco(EnderecoModel enderecoModel) {
-        validaEndereco(enderecoModel);
-        EnderecoModel retorno = new EnderecoModel();
+    
+    public EnderecoDTO insertEndereco(EnderecoDTO enderecoDTO) {
+        EnderecoModel enderecoModel = ajustaEndereco(enderecoDTO);
+        validaEndereco(ajustaEndereco(enderecoDTO));
         
         try {
         connection = connectionFactory.getConnection();
+            connection.setAutoCommit(false);
         enderecoRepository = new EnderecoRepository(connection);
         
-        retorno = enderecoRepository.insertEndereco(enderecoModel);
-        connection.close();
-        } catch (SQLException ex) {
+        enderecoModel = enderecoRepository.insertEndereco(enderecoModel);
+        } 
+        catch (SQLException ex) {
             throw new DataBaseException(ex.getMessage());
         }
+        finally {
+            if(connection != null)
+                connectionFactory.closeConnection(connection);
+        }
         
-        return retorno;
+        return EnderecoDTO.enderecoDTOMapper(enderecoModel);
     }
     
-    public EnderecoModel getEnderecoById(int id) {
+    public EnderecoDTO getEnderecoById(int id) {
         EnderecoModel retorno = new EnderecoModel();
         
         try {
             connection = connectionFactory.getConnection();
+            connection.setAutoCommit(false);
             enderecoRepository = new EnderecoRepository(connection);
 
             retorno = enderecoRepository.getEnderecoById(id);
-            connection.close();
-        } catch (SQLException ex) {
+        } 
+        catch (SQLException ex) {
             throw new DataBaseException(ex.getMessage());
+        } 
+        finally {
+            if(connection != null)
+                connectionFactory.closeConnection(connection);
         }
         
-        return retorno;
+        return EnderecoDTO.enderecoDTOMapper(retorno);
     }
     
-    public ArrayList<EnderecoModel> getAllEnderecos() {
-        ArrayList<EnderecoModel> retorno = new ArrayList<EnderecoModel>();
+    public ArrayList<EnderecoDTO> getAllEnderecos() {
+        ArrayList<EnderecoModel> consulta = new ArrayList<EnderecoModel>();
+        ArrayList<EnderecoDTO> retorno = new ArrayList<EnderecoDTO>();
         
         try {
             connection = connectionFactory.getConnection();
+            connection.setAutoCommit(false);
             enderecoRepository = new EnderecoRepository(connection);
 
-            retorno = enderecoRepository.getAllEnderecos();
-            connection.close();
-        } catch (SQLException ex) {
+            consulta = enderecoRepository.getAllEnderecos();
+            
+            for(EnderecoModel enderecoModel : consulta) {
+                retorno.add(EnderecoDTO.enderecoDTOMapper(enderecoModel));
+            }
+            
+        } 
+        catch (SQLException ex) {
             throw new DataBaseException(ex.getMessage());
+        } 
+        finally {
+            if(connection != null)
+                connectionFactory.closeConnection(connection);
         }
         
         return retorno;
     }
     
-    public EnderecoModel updateEndereco(EnderecoModel enderecoModel) {
+    public EnderecoDTO updateEndereco(EnderecoDTO enderecoDTO) {
+        EnderecoModel enderecoModel = ajustaEndereco(enderecoDTO);
         validaEndereco(enderecoModel);
-        EnderecoModel retorno = new EnderecoModel();
         
         try {
             connection = connectionFactory.getConnection();
+            connection.setAutoCommit(false);
             enderecoRepository = new EnderecoRepository(connection);
 
-            retorno = enderecoRepository.updateEndereco(enderecoModel);
-            connection.close();
-        } catch (SQLException ex) {
+            enderecoModel = enderecoRepository.updateEndereco(enderecoModel);
+        } 
+        catch (SQLException ex) {
             throw new DataBaseException(ex.getMessage());
+        } 
+        finally {
+            if(connection != null)
+                connectionFactory.closeConnection(connection);
+        }
+        
+        return EnderecoDTO.enderecoDTOMapper(enderecoModel);
+    }
+    
+    public EnderecoDTO deleteEnderecoById(int id) {
+        EnderecoDTO retorno = new EnderecoDTO();
+        
+        
+        try {
+            connection = connectionFactory.getConnection();
+            connection.setAutoCommit(false);
+            enderecoRepository = new EnderecoRepository(connection);
+            
+            int retornoConsulta = enderecoRepository.deleteEnderecoById(id);
+            
+            if(retornoConsulta == 0) {
+                throw new ValidationException("Erro ao deletar: Não foi possivel encontrar esse endereço");
+            }
+            
+            retorno.setId(id);
+        } 
+        catch (SQLException ex) {
+            throw new DataBaseException(ex.getMessage());
+        } 
+        finally {
+            if(connection != null)
+                connectionFactory.closeConnection(connection);
         }
         
         return retorno;
-    }
-    
-    public void deleteEnderecoById(int id) {
-        try {
-            connection = connectionFactory.getConnection();
-            enderecoRepository = new EnderecoRepository(connection);
-
-            enderecoRepository.deleteEnderecoById(id);
-            connection.close();
-        } catch (SQLException ex) {
-            throw new DataBaseException(ex.getMessage());
-        }
     }
 }

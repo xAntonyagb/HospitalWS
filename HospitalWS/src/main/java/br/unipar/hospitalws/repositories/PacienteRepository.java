@@ -14,7 +14,6 @@ public class PacienteRepository {
     public PacienteRepository(Connection connection) throws SQLException {
         this.connection = connection;
         pessoaRepository = new PessoaRepository(connection);
-        connection.setAutoCommit(false);
     }
     
     public PacienteModel insertPaciente(PacienteModel pacienteModel) {
@@ -24,20 +23,19 @@ public class PacienteRepository {
 
         try {
             ps = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
-            ps.setInt(1, pacienteModel.getPessoaId());
+            ps.setInt(1, pacienteModel.getIdPessoa());
             ps.setBoolean(2, true);
             ps.executeUpdate();
 
             rs = ps.getGeneratedKeys();
 
             rs.next();
-            pacienteModel.setPacienteId(rs.getInt(1));
-
+            pacienteModel.setIdPaciente(rs.getInt(1));
+            return pacienteModel;
 
         } catch (SQLException ex) {
             throw new DataBaseException(ex.getMessage());
         }
-        return null;
     }
     
     public PacienteModel getPacienteById(int id) {
@@ -45,20 +43,23 @@ public class PacienteRepository {
                 + "WHERE id = ?";
         PreparedStatement ps = null;
         ResultSet rs = null;
-         try {
-             ps = connection.prepareStatement(sql);
-             ps.setInt(1, id);
-             rs = ps.executeQuery();
-             while (rs.next()) {
-                 PacienteModel pacienteModel = new PacienteModel();
-                 pacienteModel.setAtivo(rs.getBoolean("st_ativo"));
-                 return pacienteModel;
-             }
+        
+        try {
+            ps = connection.prepareStatement(sql);
+            ps.setInt(1, id);
+            rs = ps.executeQuery();
+            while (rs.next()) {
+                PacienteModel pacienteModel = new PacienteModel();
+                pacienteModel.setIdPessoa(rs.getInt("id_pessoa"));
+                pacienteModel = (PacienteModel) pessoaRepository.getPessoaById(pacienteModel);
 
-
-         } catch (SQLException ex) {
-             throw new DataBaseException(ex.getMessage());
-         }
+                pacienteModel.setAtivo(rs.getBoolean("st_ativo"));
+                return pacienteModel;
+            }
+            
+        } catch (SQLException ex) {
+            throw new DataBaseException(ex.getMessage());
+        }
 
         return null;
     }
@@ -75,7 +76,10 @@ public class PacienteRepository {
 
             while(rs.next()) {
                 PacienteModel pacienteModel = new PacienteModel();
+                pacienteModel.setIdPessoa(rs.getInt("id_pessoa"));
+                pacienteModel = (PacienteModel) pessoaRepository.getPessoaById(pacienteModel);
                 pacienteModel.setAtivo(rs.getBoolean("st_ativo"));
+                
                 pacientes.add(pacienteModel);
             }
 
@@ -93,11 +97,12 @@ public class PacienteRepository {
         
         try {
             ps = connection.prepareStatement(sql);
-            ps.setInt(1, pacienteModel.getPacienteId());
+            ps.setInt(1, pacienteModel.getIdPaciente());
             rs = ps.executeQuery();
             
             if (rs.next()) {
-                pacienteModel.setPessoaId(rs.getInt(1));
+                pacienteModel = new PacienteModel();
+                pacienteModel.setIdPessoa(rs.getInt(1));
             }
             
         } catch (SQLException ex) {
@@ -105,19 +110,22 @@ public class PacienteRepository {
         }
         
         pessoaRepository.updatePessoa(pacienteModel);
-
+        
         return pacienteModel;
     }
     
-    public void desativaPaciente(int id) throws SQLException{
+    public int desativaPaciente(int id) throws SQLException{
         String sql = "UPDATE tb_paciente SET st_ativo = ? " +
                 "WHERE id = ?";
         PreparedStatement ps = null;
+        
         try {
             ps = connection.prepareStatement(sql);
+            
             ps.setBoolean(1, false);
             ps.setInt(2, id);
-            ps.executeUpdate();
+            
+            return ps.executeUpdate();
         } catch (SQLException ex) {
             throw new DataBaseException(ex.getMessage());
         }
