@@ -2,6 +2,8 @@ package br.unipar.hospitalws.infrastructure;
 
 import br.unipar.hospitalws.exceptions.DataBaseException;
 import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import javax.naming.Context;
 import javax.naming.InitialContext;
@@ -23,6 +25,7 @@ public class ConnectionFactory {
         Connection retorno = null;
         try {
             retorno = getDatasource().getConnection();
+            retorno.setAutoCommit(false);
         } catch (Exception ex) {
             throw new DataBaseException(ex.getMessage());
         } 
@@ -38,11 +41,42 @@ public class ConnectionFactory {
         }
     }
     
+    public void commit(Connection connection) {
+        try {
+            connection.commit();
+        } catch (SQLException ex) {
+           throw new DataBaseException(ex.getMessage());
+        }
+    }
+    
     public void closeConnection(Connection connection) {
         try {
-            connection.close();
+            if(connection != null){
+                connection.close();
+            }
         } catch (SQLException ex) {
             throw new DataBaseException(ex.getMessage());
         }
     }
+    
+    public void closePreparedStatement(PreparedStatement ps) {
+        try {
+            if(ps != null) {
+                ps.close();
+            }
+        } catch (SQLException ex) {
+            throw new DataBaseException(ex.getMessage());
+        }
+    }
+    
+    public void closeResultSet(ResultSet rs) {
+        try {
+            if(rs != null) {
+                rs.close();
+            }
+        } catch (SQLException ex) {
+            throw new DataBaseException(ex.getMessage());
+        }
+    }
+    
 }

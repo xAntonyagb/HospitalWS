@@ -1,6 +1,6 @@
 package br.unipar.hospitalws.utils;
 
-public class StringValidatorUtil {
+public class StringFormatterUtil {
     
     public static String ajustaNormalInput(String input) {
         if(input != null) {

@@ -157,4 +157,23 @@ public class MedicoRepository {
         return retorno;
     }
     
+    public boolean isMedicoAtivo(int id) {
+        String sql = "SELECT st_ativo FROM tb_medico "
+                + "WHERE id = ?";
+        PreparedStatement ps = null;
+        ResultSet rs = null;
+        
+        try {
+            ps = connection.prepareStatement(sql);
+            ps.setInt(1, id);
+            rs = ps.executeQuery();
+            
+            rs.next();
+            return rs.getBoolean("st_ativo");
+            
+        } catch (SQLException ex) {
+            throw new DataBaseException(ex.getMessage());
+        }
+    }
+    
 }

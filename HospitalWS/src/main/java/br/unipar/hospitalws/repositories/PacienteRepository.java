@@ -131,4 +131,23 @@ public class PacienteRepository {
         }
     }
     
+    public boolean isPacienteAtivo(int id) {
+        String sql = "SELECT st_ativo FROM tb_paciente "
+                + "WHERE id = ?";
+        PreparedStatement ps = null;
+        ResultSet rs = null;
+        
+        try {
+            ps = connection.prepareStatement(sql);
+            ps.setInt(1, id);
+            rs = ps.executeQuery();
+            
+            rs.next();
+            return rs.getBoolean("st_ativo");
+            
+        } catch (SQLException ex) {
+            throw new DataBaseException(ex.getMessage());
+        }
+    }
+    
 }

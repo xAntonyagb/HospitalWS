@@ -138,7 +138,7 @@ public class EnderecoRepository {
         return enderecoModel;
     }
     
-    public int deleteEnderecoById(int id) {
+    public int deleteEndereco(int id) {
         String sql = "DELETE FROM tb_endereco "
                 + "WHERE id = ?";
         

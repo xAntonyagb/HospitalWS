@@ -8,7 +8,7 @@ import br.unipar.hospitalws.infrastructure.ConnectionFactory;
 import br.unipar.hospitalws.models.EnderecoModel;
 import br.unipar.hospitalws.models.MedicoModel;
 import br.unipar.hospitalws.repositories.MedicoRepository;
-import br.unipar.hospitalws.utils.StringValidatorUtil;
+import br.unipar.hospitalws.utils.StringFormatterUtil;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -22,18 +22,18 @@ public class MedicoService {
     private EnderecoService enderecoService = new EnderecoService();;
     
     private MedicoModel ajustaMedico(MedicoDTO medico) {
-        medico.setBairro(StringValidatorUtil.ajustaNormalInput(medico.getBairro()));
-        medico.setCEP(StringValidatorUtil.ajustaNormalInput(medico.getCEP()));
-        medico.setCRM(StringValidatorUtil.ajustaNormalInput(medico.getCRM()));
-        medico.setUF(StringValidatorUtil.ajustaNormalInput(medico.getUF()));
-        medico.setCidade(StringValidatorUtil.ajustaNormalInput(medico.getCidade()));
-        medico.setComplemento(StringValidatorUtil.ajustaNormalInput(medico.getComplemento()));
-        medico.setLogradouro(StringValidatorUtil.ajustaNormalInput(medico.getLogradouro()));
-        medico.setNome(StringValidatorUtil.ajustaNormalInput(medico.getNome()));
-        medico.setGmail(StringValidatorUtil.ajustaNormalInput(medico.getGmail()));
-        medico.setCpf(StringValidatorUtil.ajustaNumberInput(medico.getCpf()));
-        medico.setNumero(StringValidatorUtil.ajustaNumberInput(medico.getNumero()));
-        medico.setTelefone(StringValidatorUtil.ajustaNumberInput(medico.getTelefone()));
+        medico.setBairro(StringFormatterUtil.ajustaNormalInput(medico.getBairro()));
+        medico.setCEP(StringFormatterUtil.ajustaNormalInput(medico.getCEP()));
+        medico.setCRM(StringFormatterUtil.ajustaNormalInput(medico.getCRM()));
+        medico.setUF(StringFormatterUtil.ajustaNormalInput(medico.getUF()));
+        medico.setCidade(StringFormatterUtil.ajustaNormalInput(medico.getCidade()));
+        medico.setComplemento(StringFormatterUtil.ajustaNormalInput(medico.getComplemento()));
+        medico.setLogradouro(StringFormatterUtil.ajustaNormalInput(medico.getLogradouro()));
+        medico.setNome(StringFormatterUtil.ajustaNormalInput(medico.getNome()));
+        medico.setGmail(StringFormatterUtil.ajustaNormalInput(medico.getGmail()));
+        medico.setCpf(StringFormatterUtil.ajustaNumberInput(medico.getCpf()));
+        medico.setNumero(StringFormatterUtil.ajustaNumberInput(medico.getNumero()));
+        medico.setTelefone(StringFormatterUtil.ajustaNumberInput(medico.getTelefone()));
         
         return MedicoModel.medicoModelMapper(medico);
     }

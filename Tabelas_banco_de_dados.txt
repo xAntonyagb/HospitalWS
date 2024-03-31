@@ -33,3 +33,26 @@ CREATE TABLE tb_medico (
     st_ativo BOOLEAN NOT NULL,
     FOREIGN KEY (id_pessoa) REFERENCES tb_pessoa(id)
 );
+
+CREATE TABLE tb_consulta (
+	id SERIAL PRIMARY KEY NOT NULL,
+	id_medico INT NOT NULL,
+	id_paciente INT NOT NULL,
+	horario_consulta TIMESTAMP NOT NULL,
+	st_cancelada BOOLEAN NOT NULL,
+	id_motivo_cancelamento int NOT NULL,
+	FOREIGN KEY (id_medico) REFERENCES tb_medico(id),
+	FOREIGN KEY (id_paciente) REFERENCES tb_paciente(id)
+	FOREIGN KEY (id_motivo_cancelamento) REFERENCES tb_motivo_cancelamento(id);
+);
+
+CREATE TABLE tb_motivo_cancelamento (
+    id SERIAL PRIMARY KEY NOT NULL,
+    cod_motivo CHAR(1) NOT NULL,
+	desc_motivo VARCHAR NOT NULL
+);
+
+INSERT INTO tb_motivo_cancelamento (cod_motivo, desc_motivo) VALUES
+('P', 'Paciente desistiu'),
+('M', 'Médico cancelou'),
+('O', 'Outros');
