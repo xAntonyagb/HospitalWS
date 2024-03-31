@@ -101,7 +101,6 @@ public class PacienteRepository {
             rs = ps.executeQuery();
             
             if (rs.next()) {
-                pacienteModel = new PacienteModel();
                 pacienteModel.setIdPessoa(rs.getInt(1));
             }
             

@@ -108,6 +108,7 @@ public class PessoaService {
             pessoaRepository = new PessoaRepository(connection);
 
             retorno = pessoaRepository.updatePessoa(pessoaModel);
+            this.connection.commit();
         } catch (SQLException ex) {
             throw new DataBaseException(ex.getMessage());
         }

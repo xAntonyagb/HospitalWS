@@ -53,11 +53,14 @@ public class MedicoService {
                     .getIdPessoa();
             medicoModel.setIdPessoa(idPessoa);
 
-            if(medicoModel.getCRM().length() != 12) {
+            if(medicoModel.getCRM() == null) {
+                throw new ValidationException("CRM inválido! Porfavor informe um CRM");
+            }
+            if(medicoModel.getCRM() != null && medicoModel.getCRM().length() != 12) {
                 throw new ValidationException("CRM inválido! Informe um CRM com 12 digitos (" + medicoModel.getCRM().length() + ")");
             }
             if(medicoModel.getEspecialidade() == null){
-                throw new ValidationException("Especialidade inválida! Porfavor informe um tipo de especialidade válida");
+                throw new ValidationException("Especialidade inválida! Porfavor informe um tipo de especialidade válida (DERMATOLOGIA, ORTOPEDIA, CARDIOLOGIA, GINECOLOGIA)");
             }
             
             connection = connectionFactory.getConnection();
@@ -164,16 +167,11 @@ public class MedicoService {
                 throw new ValidationException("Telefone inválido! Porfavor informe um telefone com 9 digitos ("+ medicoModel.getTelefone().length() +")");
             }
             
-            int idPessoa = pessoaService.updatePessoa(medicoModel, false)
-                    .getIdPessoa();
-            medicoModel.setIdPessoa(idPessoa);
-            
-            connection = connectionFactory.getConnection();
-            connection.setAutoCommit(false);
-            medicoRepository = new MedicoRepository(connection);
+            this.connection = connectionFactory.getConnection();
+            medicoRepository = new MedicoRepository(this.connection);
 
             medicoModel = medicoRepository.updateMedico(medicoModel);
-            connection.commit();
+            connectionFactory.commit(this.connection);
         } 
         catch (SQLException ex) {
             connectionFactory.rollback(connection);

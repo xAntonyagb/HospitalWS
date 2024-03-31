@@ -2,6 +2,7 @@ package br.unipar.hospitalws.repositories;
 
 import br.unipar.hospitalws.enums.EspecialidadeEnum;
 import br.unipar.hospitalws.exceptions.DataBaseException;
+import br.unipar.hospitalws.infrastructure.ConnectionFactory;
 import br.unipar.hospitalws.models.MedicoModel;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -12,26 +13,27 @@ import java.util.ArrayList;
 
 public class MedicoRepository {
 
+    private ConnectionFactory connectionFactory = new ConnectionFactory();
     private Connection connection;
     private PessoaRepository pessoaRepository;
     
     public MedicoRepository(Connection connection) throws SQLException {
         this.connection = connection;
-        pessoaRepository = new PessoaRepository(connection);
+        this.pessoaRepository = new PessoaRepository(connection);
     }
     
     public MedicoModel insertMedico(MedicoModel medicoModel) {
-        String sql = "INSERT INTO tb_medico (id_pessoa, crm, especialidade, st_ativo) "
+        String sql = "INSERT INTO tb_medico (id_pessoa, crm, id_especialidade, st_ativo) "
                 + "VALUES (?, ?, ?, ?) ";
         
         PreparedStatement ps = null;
         ResultSet rs = null;
         
         try {
-            ps = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
+            ps = this.connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
             ps.setInt(1, medicoModel.getIdPessoa());
             ps.setString(2, medicoModel.getCRM());
-            ps.setString(3, medicoModel.getEspecialidade().getCodigo());
+            ps.setInt(3, medicoModel.getEspecialidade().getId());
             ps.setBoolean(4, true);
             ps.executeUpdate();
             
@@ -57,17 +59,17 @@ public class MedicoRepository {
         ResultSet rs = null;
         
         try {
-            ps = connection.prepareStatement(sql);
+            ps = this.connection.prepareStatement(sql);
             ps.setInt(1, id);
             rs = ps.executeQuery();
             
             if(rs.next()) {
                 MedicoModel medico = new MedicoModel();
                 medico.setIdPessoa(rs.getInt(2));
-                medico = (MedicoModel) pessoaRepository.getPessoaById(medico);
+                medico = (MedicoModel) this.pessoaRepository.getPessoaById(medico);
                 medico.setIdMedico(rs.getInt(1));
                 medico.setCRM(rs.getString(3));
-                medico.setEspecialidade(EspecialidadeEnum.getEnumByCodigo(rs.getString(4)));
+                medico.setEspecialidade(EspecialidadeEnum.getEnumById(rs.getInt(4)));
                 medico.setAtivo(rs.getBoolean(5));
                 
                 return medico;
@@ -89,17 +91,17 @@ public class MedicoRepository {
         ArrayList<MedicoModel> listMedicos = new ArrayList<MedicoModel>();
         
         try {
-            ps = connection.prepareStatement(sql);
+            ps = this.connection.prepareStatement(sql);
             rs = ps.executeQuery();
             
             while(rs.next()) {
                 MedicoModel medico = new MedicoModel();
                 
                 medico.setIdPessoa(rs.getInt(2));
-                medico = (MedicoModel) pessoaRepository.getPessoaById(medico);
+                medico = (MedicoModel) this.pessoaRepository.getPessoaById(medico);
                 medico.setIdMedico(rs.getInt(1));
                 medico.setCRM(rs.getString(3));
-                medico.setEspecialidade(EspecialidadeEnum.getEnumByCodigo(rs.getString(4)));
+                medico.setEspecialidade(EspecialidadeEnum.getEnumById(rs.getInt(4)));
                 medico.setAtivo(rs.getBoolean(5));
                 
                 listMedicos.add(medico);
@@ -118,12 +120,11 @@ public class MedicoRepository {
         ResultSet rs = null;
         
         try {
-            ps = connection.prepareStatement(sql);
+            ps = this.connection.prepareStatement(sql);
             ps.setInt(1, medicoModel.getIdMedico());
             rs = ps.executeQuery();
             
             if (rs.next()) {
-                medicoModel = new MedicoModel();
                 medicoModel.setIdPessoa(rs.getInt(1));
             }
             
@@ -132,7 +133,8 @@ public class MedicoRepository {
         }
         
         
-        pessoaRepository.updatePessoa(medicoModel);
+        this.pessoaRepository.updatePessoa(medicoModel);
+        
         return medicoModel;
     }
     
@@ -144,13 +146,12 @@ public class MedicoRepository {
         int retorno;
         
         try {
-            ps = connection.prepareStatement(sql);
+            ps = this.connection.prepareStatement(sql);
             
             ps.setBoolean(1, false);
             ps.setInt(2, id);
             
             retorno = ps.executeUpdate();
-            connection.commit();
         } catch (SQLException ex) {
             throw new DataBaseException(ex.getMessage());
         }
@@ -164,7 +165,7 @@ public class MedicoRepository {
         ResultSet rs = null;
         
         try {
-            ps = connection.prepareStatement(sql);
+            ps = this.connection.prepareStatement(sql);
             ps.setInt(1, id);
             rs = ps.executeQuery();
             
