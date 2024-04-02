@@ -11,7 +11,7 @@ import java.util.ArrayList;
 
 public class EnderecoRepository {
 
-    Connection connection;
+    Connection connection = null;
     
     public EnderecoRepository(Connection connection) throws SQLException {
         this.connection = connection;
@@ -38,7 +38,6 @@ public class EnderecoRepository {
             
             rs.next();
             enderecoModel.setIdEndereco(rs.getInt(1));
-            
             
         } catch (SQLException ex) {
             throw new DataBaseException(ex.getMessage());
@@ -120,7 +119,7 @@ public class EnderecoRepository {
         PreparedStatement ps = null;
         
         try {
-            ps = connection.prepareStatement(sql);
+            ps = this.connection.prepareStatement(sql);
             
             ps.setString(1, enderecoModel.getNumero());
             ps.setString(2, enderecoModel.getComplemento());

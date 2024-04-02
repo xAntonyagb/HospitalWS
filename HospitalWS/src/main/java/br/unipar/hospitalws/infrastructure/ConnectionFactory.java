@@ -53,6 +53,7 @@ public class ConnectionFactory {
         try {
             if(connection != null){
                 connection.close();
+                connection = null;
             }
         } catch (SQLException ex) {
             throw new DataBaseException(ex.getMessage());
@@ -63,6 +64,7 @@ public class ConnectionFactory {
         try {
             if(ps != null) {
                 ps.close();
+                ps = null;
             }
         } catch (SQLException ex) {
             throw new DataBaseException(ex.getMessage());
@@ -73,6 +75,7 @@ public class ConnectionFactory {
         try {
             if(rs != null) {
                 rs.close();
+                rs = null;
             }
         } catch (SQLException ex) {
             throw new DataBaseException(ex.getMessage());

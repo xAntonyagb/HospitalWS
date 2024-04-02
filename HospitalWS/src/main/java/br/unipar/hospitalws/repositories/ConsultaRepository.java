@@ -39,14 +39,14 @@ public class ConsultaRepository {
             ps.executeUpdate();
             
             rs = ps.getGeneratedKeys();
-            
-            rs.next();
-            consulta.setIdConsulta(rs.getInt(1));
-            
-            
-        } catch (SQLException ex) {
-            throw new DataBaseException(ex.getMessage());
-        } finally {
+            if(rs.next()){
+                return retornaConsultaInstace(rs);
+            }
+        } 
+        catch (SQLException ex) {
+            throw new DataBaseException("(insertConsulta) "+ ex.getMessage());
+        } 
+        finally {
             connectionFactory.closeResultSet(rs);
             connectionFactory.closePreparedStatement(ps);
         }
@@ -55,7 +55,7 @@ public class ConsultaRepository {
     }
     
     public ConsultaModel getConsultaById(int id) {
-        String sql = "SELECT id_medico, id_paciente, horario_consulta, st_cancelada, motivo_cancelamento "
+        String sql = "SELECT id_medico, id_paciente, horario_consulta, st_cancelada, id_motivo_cancelamento "
                 + "FROM tb_consulta "
                 + "WHERE id = ?";
         
@@ -65,16 +65,16 @@ public class ConsultaRepository {
         try {
             ps = this.connection.prepareStatement(sql);
             ps.setInt(1, id);
-            
             rs = ps.executeQuery();
             
             if(rs.next()){
                 return retornaConsultaInstace(rs);
             }
-            
-        } catch (SQLException ex) {
-            throw new DataBaseException(ex.getMessage());
-        } finally {
+        } 
+        catch (SQLException ex) {
+            throw new DataBaseException("(getConsultaById) "+ ex.getMessage());
+        } 
+        finally {
             connectionFactory.closeResultSet(rs);
             connectionFactory.closePreparedStatement(ps);
         }
@@ -83,7 +83,7 @@ public class ConsultaRepository {
     }
     
     public ArrayList<ConsultaModel> getAllConsultas() {
-        String sql = "SELECT id, id_medico, id_paciente, horario_consulta, st_cancelada, motivo_cancelamento FROM tb_consulta";
+        String sql = "SELECT id, id_medico, id_paciente, horario_consulta, st_cancelada, id_motivo_cancelamento FROM tb_consulta";
         ArrayList<ConsultaModel> listConsultas = new ArrayList<ConsultaModel>();
         PreparedStatement ps = null;
         ResultSet rs = null;
@@ -99,7 +99,7 @@ public class ConsultaRepository {
             
         } 
         catch (SQLException ex) {
-            throw new DataBaseException(ex.getMessage());
+            throw new DataBaseException("(getAllConsultas) "+ ex.getMessage());
         } 
         finally {
             connectionFactory.closeResultSet(rs);
@@ -111,11 +111,10 @@ public class ConsultaRepository {
     
     public ConsultaModel updateConsulta(ConsultaModel consulta) {
         String sql = "UPDATE tb_consulta SET "
-                + "id_medico = ?, id_paciente = ?, horario_consulta = ?, st_cancelada = ?, motivo_cancelamento = ? "
+                + "id_medico = ?, id_paciente = ?, horario_consulta = ?, st_cancelada = ?, id_motivo_cancelamento = ? "
                 + "WHERE id = ? ";
-        
+
         PreparedStatement ps = null;
-        ResultSet rs = null;
         
         try {
             ps = this.connection.prepareStatement(sql);
@@ -127,39 +126,34 @@ public class ConsultaRepository {
             ps.setInt(5, consulta.getMotivoCancelamento().getId());
             ps.setInt(6, consulta.getIdConsulta());
             
-            rs = ps.executeQuery();
-            
-            return retornaConsultaInstace(rs);
-        } 
+            ps.executeUpdate();
+        }
         catch (SQLException ex) {
-            throw new DataBaseException(ex.getMessage());
+            throw new DataBaseException("(updateConsulta) "+ ex.getMessage());
         } 
         finally {
-            connectionFactory.closeResultSet(rs);
             connectionFactory.closePreparedStatement(ps);
         }
         
+        return consulta;
     }
     
     public boolean cancelarConsulta(ConsultaModel consulta) {
-        String sql = "UPDATE tb_consulta SET st_cancelada = ?, motivo_cancelamento = ? "
+        String sql = "UPDATE tb_consulta SET st_cancelada = ?, id_motivo_cancelamento = ? "
                 + "WHERE id = ? ";
-        
+       
         PreparedStatement ps = null;
-        int retorno;
         
         try {
             ps = this.connection.prepareStatement(sql);
-            
             ps.setBoolean(1, true);
             ps.setInt(2, consulta.getMotivoCancelamento().getId());
             
             int linhasDelete = ps.executeUpdate();
             return linhasDelete > 0;
-            
         }  
         catch (SQLException ex) {
-            throw new DataBaseException(ex.getMessage());
+            throw new DataBaseException("(cancelarConsulta) "+ ex.getMessage());
         } 
         finally {
            connectionFactory.closePreparedStatement(ps);
@@ -187,7 +181,7 @@ public class ConsultaRepository {
             
         }  
         catch (SQLException ex) {
-            throw new DataBaseException(ex.getMessage());
+            throw new DataBaseException("(getHoraConsultaByIdMedico) "+ ex.getMessage());
         } 
         finally {
            connectionFactory.closeResultSet(rs);
@@ -218,7 +212,7 @@ public class ConsultaRepository {
             
         } 
         catch (SQLException ex) {
-            throw new DataBaseException(ex.getMessage());
+            throw new DataBaseException("(getHoraConsultaByIdPaciente) "+ ex.getMessage());
         } 
         finally {
            connectionFactory.closeResultSet(rs);
@@ -256,7 +250,7 @@ public class ConsultaRepository {
             }
         } 
         catch (SQLException ex) {
-            throw new DataBaseException(ex.getMessage());
+            throw new DataBaseException("(getMedicosDisponiveis) "+ ex.getMessage());
         } 
         finally {
             connectionFactory.closeResultSet(rs);
@@ -267,16 +261,21 @@ public class ConsultaRepository {
     }
 
     
-    private ConsultaModel retornaConsultaInstace(ResultSet rs) throws SQLException {
-        ConsultaModel consulta = new ConsultaModel();
-        consulta.setIdConsulta(rs.getInt("id"));
-        consulta.getMedico().setIdMedico((rs.getInt("id_medico")));
-        consulta.getPaciente().setIdPaciente(rs.getInt("id_paciente"));
-        consulta.setHorarioConsulta(rs.getTimestamp("horario_consulta"));
-        consulta.setIsCancelada(rs.getBoolean("st_cancelada"));
-        consulta.setMotivoCancelamento(MotivoCancelamentoEnum.getEnumById(rs.getInt("motivo_cancelamento")));
+    private ConsultaModel retornaConsultaInstace(ResultSet rs) {
+        try {
+            ConsultaModel consulta = new ConsultaModel();
+            consulta.setIdConsulta(rs.getInt("id"));
+            consulta.getMedico().setIdMedico((rs.getInt("id_medico")));
+            consulta.getPaciente().setIdPaciente(rs.getInt("id_paciente"));
+            consulta.setHorarioConsulta(rs.getTimestamp("horario_consulta"));
+            consulta.setIsCancelada(rs.getBoolean("st_cancelada"));
+            consulta.setMotivoCancelamento(MotivoCancelamentoEnum.getEnumById(rs.getInt("id_motivo_cancelamento")));
 
-        return consulta;
+            return consulta;
+        }
+        catch (SQLException ex) {
+            throw new DataBaseException("(retornaConsultaInstace) "+ ex.getMessage());
+        }
     }
     
 }

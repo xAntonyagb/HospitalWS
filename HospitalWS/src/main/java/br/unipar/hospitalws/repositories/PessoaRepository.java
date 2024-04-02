@@ -1,6 +1,8 @@
 package br.unipar.hospitalws.repositories;
 
 import br.unipar.hospitalws.exceptions.DataBaseException;
+import br.unipar.hospitalws.infrastructure.ConnectionFactory;
+import br.unipar.hospitalws.models.MedicoModel;
 import br.unipar.hospitalws.models.PacienteModel;
 import br.unipar.hospitalws.models.PessoaModel;
 import java.sql.Connection;
@@ -12,6 +14,7 @@ import java.util.ArrayList;
 
 public class PessoaRepository {
 
+    private ConnectionFactory connectionFactory = new ConnectionFactory();
     private Connection connection;
     private EnderecoRepository enderecoRepository;
     
@@ -22,12 +25,11 @@ public class PessoaRepository {
     
     public PessoaModel insertPessoa(PessoaModel pessoaModel) {
         String sql = "INSERT INTO tb_pessoa (nome, gmail, telefone, id_endereco, cpf) VALUES(?, ?, ?, ?, ? )";
-        
         PreparedStatement ps = null;
         ResultSet rs = null;
         
         try {
-            ps = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
+            ps = this.connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
             ps.setString(1, pessoaModel.getNome());
             ps.setString(2, pessoaModel.getGmail());
             ps.setString(3, pessoaModel.getTelefone());
@@ -37,12 +39,17 @@ public class PessoaRepository {
             
             rs = ps.getGeneratedKeys();
             
-            rs.next();
-            pessoaModel.setIdPessoa(rs.getInt(1));
-            
-            
-        } catch (SQLException ex) {
-            throw new DataBaseException(ex.getMessage());
+            if(rs.next()) {
+                pessoaModel.setIdPessoa(rs.getInt(1));
+            }
+            connectionFactory.commit(connection);
+        } 
+        catch (SQLException ex) {
+            throw new DataBaseException("(insertPessoa) "+ ex.getMessage());
+        }
+        finally {
+            connectionFactory.closeResultSet(rs);
+            connectionFactory.closePreparedStatement(ps);
         }
         
         return pessoaModel;
@@ -58,17 +65,16 @@ public class PessoaRepository {
             ps.setInt(1, pessoaModel.getIdPessoa());
             rs = ps.executeQuery();
             
-            while(rs.next()) {
-                pessoaModel.setIdPessoa(rs.getInt(1));
-                pessoaModel.setNome(rs.getString(2));
-                pessoaModel.setGmail(rs.getString(3));
-                pessoaModel.setTelefone(rs.getString(4));
-                pessoaModel.setEndereco(this.enderecoRepository.getEnderecoById(rs.getInt(5)));
-                pessoaModel.setCpf(rs.getString(6));
+            if(rs.next()) {
+                pessoaModel = retornaPessoaInstance(rs);
             }
-            
-        } catch (SQLException ex) {
-            throw new DataBaseException(ex.getMessage());
+        } 
+        catch (SQLException ex) {
+            throw new DataBaseException("(getPessoaById) "+ ex.getMessage());
+        }
+        finally {
+            connectionFactory.closeResultSet(rs);
+            connectionFactory.closePreparedStatement(ps);
         }
         
         return pessoaModel;
@@ -76,30 +82,24 @@ public class PessoaRepository {
     
     public ArrayList<PessoaModel> getAllPessoas() {
         String sql = "SELECT *  FROM tb_pessoa"; 
+        ArrayList<PessoaModel> listPessoas = new ArrayList<PessoaModel>();
         PreparedStatement ps = null;
         ResultSet rs = null;
-        
-        ArrayList<PessoaModel> listPessoas = new ArrayList<PessoaModel>();
         
         try {
             ps = this.connection.prepareStatement(sql);
             rs = ps.executeQuery();
             
             while(rs.next()) {
-                PessoaModel pessoa = new PacienteModel(); // :)
-
-                pessoa.setIdPessoa(rs.getInt(1));
-                pessoa.setNome(rs.getString(2));
-                pessoa.setGmail(rs.getString(3));
-                pessoa.setTelefone(rs.getString(4));
-                pessoa.setEndereco(this.enderecoRepository.getEnderecoById(rs.getInt(5)));
-                pessoa.setCpf(rs.getString(6));
-                
-                listPessoas.add(pessoa);
+                listPessoas.add(retornaPessoaInstance(rs));
             }
-            
-        } catch (SQLException ex) {
-            throw new DataBaseException(ex.getMessage());
+        } 
+        catch (SQLException ex) {
+            throw new DataBaseException("(getAllPessoas) "+ ex.getMessage());
+        }
+        finally {
+            connectionFactory.closeResultSet(rs);
+            connectionFactory.closePreparedStatement(ps);
         }
         
         return listPessoas;
@@ -118,12 +118,15 @@ public class PessoaRepository {
             this.enderecoRepository.updateEndereco(pessoaModel.getEndereco());
             
             ps.executeUpdate();
-            this.connection.commit();
-        } catch (SQLException ex) {
-            throw new DataBaseException(ex.getMessage());
+            return getPessoaById(pessoaModel);
+        } 
+        catch (SQLException ex) {
+            throw new DataBaseException("(updatePessoa) "+ ex.getMessage());
+        }
+        finally {
+            connectionFactory.closePreparedStatement(ps);
         }
         
-        return pessoaModel;
     }
     
     public void deletePessoaById(int id) {
@@ -135,8 +138,28 @@ public class PessoaRepository {
             ps.setInt(1, id);
 
             ps.executeUpdate();
-        } catch (SQLException ex) {
-            throw new DataBaseException(ex.getMessage());
+        } 
+        catch (SQLException ex) {
+            throw new DataBaseException("(deletePessoaById) "+ ex.getMessage());
+        }
+        finally {
+            connectionFactory.closePreparedStatement(ps);
+        }
+    }
+    
+    private PessoaModel retornaPessoaInstance(ResultSet rs) {
+        try {
+            PessoaModel pessoa = (PessoaModel) new MedicoModel(); // :)
+            pessoa.setIdPessoa(rs.getInt(1));
+            pessoa.setNome(rs.getString(2));
+            pessoa.setGmail(rs.getString(3));
+            pessoa.setTelefone(rs.getString(4));
+            pessoa.setEndereco(this.enderecoRepository.getEnderecoById(rs.getInt(5)));
+            pessoa.setCpf(rs.getString(6));
+            return pessoa;
+        }
+        catch(SQLException ex) {
+            throw new DataBaseException("(retornaPessoaInstance) "+ ex.getMessage());
         }
     }
     

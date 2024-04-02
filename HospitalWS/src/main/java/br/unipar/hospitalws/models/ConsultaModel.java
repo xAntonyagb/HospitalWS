@@ -33,7 +33,7 @@ public class ConsultaModel {
         ConsultaModel consultaModel = new ConsultaModel();
         consultaModel.getMedico().setIdMedico(consultaDTO.getIdMedico());
         consultaModel.getPaciente().setIdPaciente(consultaDTO.getIdPaciente());
-        consultaModel.setHorarioConsulta(DateFormatterUtil.toTimestamp(consultaDTO.getHorarioConsulta()));
+//        consultaModel.setHorarioConsulta(DateFormatterUtil.toTimestamp(consultaDTO.getHorarioConsulta()));
         consultaModel.setMotivoCancelamento(consultaDTO.getMotivoCancelamento());
         consultaModel.setIdConsulta(consultaDTO.getId());
         

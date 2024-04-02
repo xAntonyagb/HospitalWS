@@ -19,6 +19,10 @@ import java.util.ArrayList;
 import java.util.Random;
 
 public class ConsultaService {
+
+    public ConsultaService() {
+        System.out.println("teste");
+    }
     
     private ConnectionFactory connectionFactory = new ConnectionFactory();
     private Connection connection = null;
@@ -29,23 +33,11 @@ public class ConsultaService {
     private static final int HORA_ABERTURA = 7;
     private static final int HORA_FECHAMENTO = 19;
 
-    public ConsultaService() {
-        try {
-            this.connection = connectionFactory.getConnection();
-            this.consultaRepository = new ConsultaRepository(this.connection);
-            this.medicoRepository = new MedicoRepository(this.connection);
-            this.pacienteRepository = new PacienteRepository(this.connection);
-        } catch (SQLException ex) {
-            connectionFactory.closeConnection(connection);
-            throw new DataBaseException(ex.getMessage());
-        }
-    }
-    
     //Metodos padrões
     public ConsultaDTO insertConsulta(ConsultaDTO consulta) {
         try {
-            if(this.connection == null)
-                this.connection = this.connectionFactory.getConnection();
+            this.connection = this.connectionFactory.getConnection();
+            this.consultaRepository = new ConsultaRepository(this.connection);
             
             ConsultaModel consultaModel = validaConsulta(ajustaConsulta(consulta));
             consultaModel = this.consultaRepository.insertConsulta(consultaModel);
@@ -57,6 +49,12 @@ public class ConsultaService {
             this.connectionFactory.rollback(this.connection);
             throw ex;
         }
+        catch(SQLException ex) {
+            throw new DataBaseException(ex.getMessage());
+        }
+        catch(Exception ex) {
+            throw ex;
+        }
         finally {
             this.connectionFactory.closeConnection(this.connection);
         }
@@ -64,8 +62,8 @@ public class ConsultaService {
 
     public ConsultaDTO getConsultaById(int id) {
         try {
-            if(this.connection == null)
-                this.connection = this.connectionFactory.getConnection();
+            this.connection = this.connectionFactory.getConnection();
+            this.consultaRepository = new ConsultaRepository(this.connection);
 
             ConsultaModel retorno = this.consultaRepository.getConsultaById(id);
             connectionFactory.commit(this.connection);
@@ -75,6 +73,9 @@ public class ConsultaService {
             this.connectionFactory.rollback(this.connection);
             throw ex;
         }
+        catch(SQLException ex) {
+            throw new DataBaseException(ex.getMessage());
+        }
         finally {
             this.connectionFactory.closeConnection(this.connection);
         }
@@ -82,8 +83,8 @@ public class ConsultaService {
 
     public ArrayList<ConsultaDTO> getAllConsultas() {
         try{
-            if(this.connection == null)
-                this.connection = this.connectionFactory.getConnection();
+            this.connection = this.connectionFactory.getConnection();
+            this.consultaRepository = new ConsultaRepository(this.connection);
 
             ArrayList<ConsultaDTO> retorno = new ArrayList<>();
             ArrayList<ConsultaModel> consulta = this.consultaRepository.getAllConsultas();
@@ -99,6 +100,9 @@ public class ConsultaService {
             this.connectionFactory.rollback(this.connection);
             throw ex;
         }
+        catch(SQLException ex) {
+            throw new DataBaseException(ex.getMessage());
+        }
         finally {
             this.connectionFactory.closeConnection(this.connection);
         }
@@ -106,8 +110,8 @@ public class ConsultaService {
 
     public ConsultaDTO updateConsulta(ConsultaDTO consulta) {
         try{
-            if(this.connection == null)
-                this.connection = this.connectionFactory.getConnection();
+            this.connection = this.connectionFactory.getConnection();
+            this.consultaRepository = new ConsultaRepository(this.connection);
 
             ConsultaModel consultaModel = validaConsulta(ajustaConsulta(consulta));
             consultaModel = this.consultaRepository.updateConsulta(consultaModel);
@@ -119,6 +123,9 @@ public class ConsultaService {
             this.connectionFactory.rollback(this.connection);
             throw ex;
         }
+        catch(SQLException ex) {
+            throw new DataBaseException(ex.getMessage());
+        }
         finally {
             this.connectionFactory.closeConnection(this.connection);
         }
@@ -126,8 +133,8 @@ public class ConsultaService {
 
     public ConsultaDTO cancelarConsulta(ConsultaDTO consulta) {
         try {
-            if(this.connection == null)
-                this.connection = this.connectionFactory.getConnection();
+            this.connection = this.connectionFactory.getConnection();
+            this.consultaRepository = new ConsultaRepository(this.connection);
 
             ConsultaModel consultaModel = ajustaConsulta(consulta);
             validaCancelamento(consultaModel);
@@ -144,6 +151,9 @@ public class ConsultaService {
             this.connectionFactory.rollback(this.connection);
             throw ex;
         }
+        catch(SQLException ex) {
+            throw new DataBaseException(ex.getMessage());
+        }
         finally {
             this.connectionFactory.closeConnection(this.connection);
         }
@@ -152,7 +162,10 @@ public class ConsultaService {
     
     
     //Validações
-    private ConsultaModel validaConsulta(ConsultaModel consulta) {
+    private ConsultaModel validaConsulta(ConsultaModel consulta) throws SQLException {
+        this.medicoRepository = new MedicoRepository(this.connection);
+        this.pacienteRepository = new PacienteRepository(this.connection);
+        
         MedicoModel medico = this.medicoRepository.getMedicoById(consulta.getMedico().getIdMedico());
         PacienteModel paciente = this.pacienteRepository.getPacienteById(consulta.getPaciente().getIdPaciente());
         LocalDateTime dataHoraConsulta = DateFormatterUtil.toLocalDate(consulta.getHorarioConsulta());
