@@ -12,16 +12,23 @@ import javax.sql.DataSource;
 
 public class ConnectionFactory {
     
-    private static final String RESOURCE_NAME = "postegresResource2";
-    
+    private static final String RESOURCE_NAME = "PostgresResource2";
+    private static Connection connection = null;
     private DataSource getDataSource;
     
-    private DataSource getDatasource() throws NamingException {
-        Context c = new InitialContext();
-        return (DataSource) c.lookup(RESOURCE_NAME);
-    }
     
-    public Connection getConnection() {
+    public static Connection getConnection() {
+        if(connection == null) {
+            ConnectionFactory.connection = openConnection();
+            return openConnection();
+        }
+        else {
+            return ConnectionFactory.connection;
+        }
+    }
+
+    
+    public static Connection openConnection() {
         Connection retorno = null;
         try {
             retorno = getDatasource().getConnection();
@@ -33,27 +40,32 @@ public class ConnectionFactory {
         return retorno;
     }
     
-    public void rollback(Connection connection) {
+    private static DataSource getDatasource() throws NamingException {
+        Context c = new InitialContext();
+        return (DataSource) c.lookup(RESOURCE_NAME);
+    }
+    
+    public static void commit() {
         try {
-            connection.rollback();
-        } catch (SQLException ex) {
+            ConnectionFactory.connection.commit();
+        } 
+        catch (SQLException ex) {
+            try {
+                ConnectionFactory.connection.commit();
+            } 
+            catch (SQLException ex2) {
+               throw new DataBaseException(ex2.getMessage());
+            }
+            
            throw new DataBaseException(ex.getMessage());
         }
     }
     
-    public void commit(Connection connection) {
+    public static void closeConnection() {
         try {
-            connection.commit();
-        } catch (SQLException ex) {
-           throw new DataBaseException(ex.getMessage());
-        }
-    }
-    
-    public void closeConnection(Connection connection) {
-        try {
-            if(connection != null){
-                connection.close();
-                connection = null;
+            if(ConnectionFactory.connection != null){
+                ConnectionFactory.connection.close();
+                ConnectionFactory.connection = null;
             }
         } catch (SQLException ex) {
             throw new DataBaseException(ex.getMessage());
@@ -64,7 +76,6 @@ public class ConnectionFactory {
         try {
             if(ps != null) {
                 ps.close();
-                ps = null;
             }
         } catch (SQLException ex) {
             throw new DataBaseException(ex.getMessage());
@@ -75,7 +86,6 @@ public class ConnectionFactory {
         try {
             if(rs != null) {
                 rs.close();
-                rs = null;
             }
         } catch (SQLException ex) {
             throw new DataBaseException(ex.getMessage());

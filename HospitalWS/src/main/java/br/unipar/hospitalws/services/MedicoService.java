@@ -25,7 +25,7 @@ public class MedicoService {
     public MedicoService() {
         try {
             this.connection = connectionFactory.getConnection();
-            medicoRepository = new MedicoRepository(this.connection);
+            medicoRepository = new MedicoRepository();
             pessoaRepository = new PessoaRepository(this.connection);
             enderecoRepository = new EnderecoRepository(this.connection);
         }
@@ -41,7 +41,7 @@ public class MedicoService {
         try {
              try {
                 this.connection = connectionFactory.getConnection();
-                this.medicoRepository = new MedicoRepository(this.connection);
+                this.medicoRepository = new MedicoRepository();
                 this.enderecoRepository = new EnderecoRepository(this.connection);
             } catch (SQLException ex) { }
             
@@ -49,7 +49,7 @@ public class MedicoService {
             EnderecoService.validaEndereco(medicoModel.getEndereco());
             EnderecoModel enderecoRetorno = this.enderecoRepository.insertEndereco(medicoModel.getEndereco());
             medicoModel.setEndereco(enderecoRetorno);
-            connectionFactory.commit(connection);
+            ConnectionFactory.commit();
 
             PessoaService.validaPessoa(medicoModel);
             int idPessoa = this.pessoaRepository.insertPessoa(medicoModel)
@@ -67,14 +67,14 @@ public class MedicoService {
             }
             
             medicoModel = this.medicoRepository.insertMedico(medicoModel);
-            connectionFactory.commit(connection);
+            ConnectionFactory.commit();
         } 
         catch (DataBaseException ex) {
-            connectionFactory.rollback(connection);
+            ConnectionFactory.closeConnection();
             throw ex;
         } 
         finally {
-            connectionFactory.closeConnection(connection);
+            ConnectionFactory.closeConnection();
         }
         
         return MedicoDTO.medicoDTOMapper(medicoModel);
@@ -84,26 +84,25 @@ public class MedicoService {
         try {
             try {
                 this.connection = connectionFactory.getConnection();
-                this.medicoRepository = new MedicoRepository(this.connection);
+                this.medicoRepository = new MedicoRepository();
             } catch (SQLException ex) { }
             
             MedicoModel retorno = this.medicoRepository.getMedicoById(id);
-            connectionFactory.commit(this.connection);
+            ConnectionFactory.commit();
             return MedicoDTO.medicoDTOMapper(retorno);
         } 
         catch (DataBaseException ex) {
-            connectionFactory.rollback(connection);
             throw ex;
         } 
         finally {
-            connectionFactory.closeConnection(connection);
+            ConnectionFactory.closeConnection();
         }
     }
     
     public ArrayList<MedicoDTO> getAllMedicos() {
         try {
                 this.connection = connectionFactory.getConnection();
-                this.medicoRepository = new MedicoRepository(this.connection);
+                this.medicoRepository = new MedicoRepository();
             } catch (SQLException ex) { }
             
         ArrayList<MedicoDTO> retorno = new ArrayList<MedicoDTO>();
@@ -117,14 +116,13 @@ public class MedicoService {
                 retorno.add(MedicoDTO.medicoDTOMapper(medicoModel));
             }
             
-            connectionFactory.commit(this.connection);
+            ConnectionFactory.commit();
         } 
         catch (DataBaseException ex) {
-            connectionFactory.rollback(this.connection);
             throw ex;
         } 
         finally {
-            connectionFactory.closeConnection(this.connection);
+            ConnectionFactory.closeConnection();
         }
         
         return retorno;
@@ -136,7 +134,7 @@ public class MedicoService {
         try {
             try {
                 this.connection = connectionFactory.getConnection();
-                this.medicoRepository = new MedicoRepository(this.connection);
+                this.medicoRepository = new MedicoRepository();
                 this.enderecoRepository = new EnderecoRepository(this.connection);
             } catch (SQLException ex) { }
             
@@ -164,15 +162,13 @@ public class MedicoService {
             }
 
             medicoModel = this.medicoRepository.updateMedico(medicoModel);
-            connectionFactory.commit(this.connection);
-            connectionFactory.commit(connection);
+            ConnectionFactory.commit();
         } 
         catch (DataBaseException ex) {
-            connectionFactory.rollback(this.connection);
             throw ex;
         } 
         finally {
-            connectionFactory.closeConnection(this.connection);
+            ConnectionFactory.closeConnection();
         }
         
         return MedicoDTO.medicoDTOMapper(medicoModel);
@@ -191,15 +187,14 @@ public class MedicoService {
             retorno.setId(id);
             retorno.setAtivo(false);
             
-            connectionFactory.commit(connection);
+            ConnectionFactory.commit();
             return retorno;
         } 
         catch (DataBaseException ex) {
-            connectionFactory.rollback(connection);
             throw ex;
         } 
         finally {
-            connectionFactory.closeConnection(connection);
+            ConnectionFactory.closeConnection();
         }
     }
     

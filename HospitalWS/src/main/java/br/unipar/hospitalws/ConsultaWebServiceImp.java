@@ -6,7 +6,7 @@ import br.unipar.hospitalws.exceptions.ValidationException;
 import br.unipar.hospitalws.interfaces.ConsultaWebService;
 import br.unipar.hospitalws.services.ConsultaService;
 import jakarta.jws.WebService;
-import java.util.ArrayList;
+import java.util.List;
 
 @WebService(endpointInterface = "br.unipar.hospitalws.interfaces.ConsultaWebService")
 public class ConsultaWebServiceImp implements ConsultaWebService{
@@ -24,7 +24,7 @@ public class ConsultaWebServiceImp implements ConsultaWebService{
     }
 
     @Override
-    public ArrayList<ConsultaDTO> getAllConsultas() throws ValidationException, DataBaseException {
+    public List<ConsultaDTO> getAllConsultas() throws ValidationException, DataBaseException {
         return consultaService.getAllConsultas();
     }
 

@@ -29,6 +29,7 @@ D:\Faculdade\Progrmaacao para internet\HospitalWS\HospitalWS\src\main\java\br\un
 D:\Faculdade\Progrmaacao para internet\HospitalWS\HospitalWS\src\main\java\br\unipar\hospitalws\exceptions\ValidationException.java
 D:\Faculdade\Progrmaacao para internet\HospitalWS\HospitalWS\src\main\java\br\unipar\hospitalws\repositories\ConsultaRepository.java
 D:\Faculdade\Progrmaacao para internet\HospitalWS\HospitalWS\src\main\java\br\unipar\hospitalws\interfaces\ConsultaWebService.java
+D:\Faculdade\Progrmaacao para internet\HospitalWS\HospitalWS\src\main\java\br\unipar\hospitalws\exceptions\FormattingException.java
 D:\Faculdade\Progrmaacao para internet\HospitalWS\HospitalWS\src\main\java\br\unipar\hospitalws\utils\StringFormatterUtil.java
 D:\Faculdade\Progrmaacao para internet\HospitalWS\HospitalWS\src\main\java\br\unipar\hospitalws\exceptions\DataBaseException.java
 D:\Faculdade\Progrmaacao para internet\HospitalWS\HospitalWS\src\main\java\br\unipar\hospitalws\repositories\MedicoRepository.java

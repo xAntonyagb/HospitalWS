@@ -1,6 +1,7 @@
 package br.unipar.hospitalws.repositories;
 
 import br.unipar.hospitalws.exceptions.DataBaseException;
+import br.unipar.hospitalws.infrastructure.ConnectionFactory;
 import br.unipar.hospitalws.models.PacienteModel;
 
 import java.sql.*;
@@ -11,8 +12,8 @@ public class PacienteRepository {
     private PessoaRepository pessoaRepository;
     private Connection connection;
     
-    public PacienteRepository(Connection connection) throws SQLException {
-        this.connection = connection;
+    public PacienteRepository() throws SQLException {
+        this.connection = ConnectionFactory.getConnection();
         pessoaRepository = new PessoaRepository(connection);
     }
     
@@ -22,7 +23,7 @@ public class PacienteRepository {
         ResultSet rs = null;
 
         try {
-            ps = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
+            ps = this.connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
             ps.setInt(1, pacienteModel.getIdPessoa());
             ps.setBoolean(2, true);
             ps.executeUpdate();
@@ -45,15 +46,17 @@ public class PacienteRepository {
         ResultSet rs = null;
         
         try {
-            ps = connection.prepareStatement(sql);
+            ps = this.connection.prepareStatement(sql);
             ps.setInt(1, id);
             rs = ps.executeQuery();
-            while (rs.next()) {
+            
+            if (rs.next()) {
                 PacienteModel pacienteModel = new PacienteModel();
                 pacienteModel.setIdPessoa(rs.getInt("id_pessoa"));
                 pacienteModel = (PacienteModel) pessoaRepository.getPessoaById(pacienteModel);
-
                 pacienteModel.setAtivo(rs.getBoolean("st_ativo"));
+                pacienteModel.setIdPaciente(id);
+                
                 return pacienteModel;
             }
             
@@ -71,7 +74,7 @@ public class PacienteRepository {
 
         ArrayList<PacienteModel> pacientes = new ArrayList<>();
         try {
-            ps = connection.prepareStatement(sql);
+            ps = this.connection.prepareStatement(sql);
             rs = ps.executeQuery();
 
             while(rs.next()) {
@@ -96,7 +99,7 @@ public class PacienteRepository {
         ResultSet rs = null;
         
         try {
-            ps = connection.prepareStatement(sql);
+            ps = this.connection.prepareStatement(sql);
             ps.setInt(1, pacienteModel.getIdPaciente());
             rs = ps.executeQuery();
             
@@ -119,7 +122,7 @@ public class PacienteRepository {
         PreparedStatement ps = null;
         
         try {
-            ps = connection.prepareStatement(sql);
+            ps = this.connection.prepareStatement(sql);
             
             ps.setBoolean(1, false);
             ps.setInt(2, id);
@@ -137,16 +140,19 @@ public class PacienteRepository {
         ResultSet rs = null;
         
         try {
-            ps = connection.prepareStatement(sql);
+            ps = this.connection.prepareStatement(sql);
             ps.setInt(1, id);
             rs = ps.executeQuery();
             
-            rs.next();
-            return rs.getBoolean("st_ativo");
+            if(rs.next()) {
+                return rs.getBoolean("st_ativo");
+            }
             
         } catch (SQLException ex) {
             throw new DataBaseException(ex.getMessage());
         }
+        
+        return false;
     }
     
 }

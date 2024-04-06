@@ -52,20 +52,16 @@ public class PacienteService {
                     .getIdPessoa();
             pacienteModel.setIdPessoa(idPessoa);
 
-            connection = connectionFactory.getConnection();
-            connection.setAutoCommit(false);
-            pacienteRepository = new PacienteRepository(connection);
+            pacienteRepository = new PacienteRepository();
 
             pacienteModel = pacienteRepository.insertPaciente(pacienteModel);
             connection.commit();
         } 
         catch (SQLException ex) {
-            connectionFactory.rollback(connection);
             throw new DataBaseException(ex.getMessage());
         } 
         finally {
-            if(connection != null)
-                connectionFactory.closeConnection(connection);
+            ConnectionFactory.closeConnection();
         }
         
         return PacienteDTO.pacienteDTOMapper(pacienteModel);
@@ -76,8 +72,7 @@ public class PacienteService {
         
         try {
             connection = connectionFactory.getConnection();
-            connection.setAutoCommit(false);
-            pacienteRepository = new PacienteRepository(connection);
+            pacienteRepository = new PacienteRepository();
 
             retorno = pacienteRepository.getPacienteById(id);
             connection.commit();
@@ -86,8 +81,7 @@ public class PacienteService {
             throw new DataBaseException(ex.getMessage());
         }
         finally {
-            if(connection != null)
-                connectionFactory.closeConnection(connection);
+            ConnectionFactory.closeConnection();
         }
         
         return PacienteDTO.pacienteDTOMapper(retorno);
@@ -99,8 +93,7 @@ public class PacienteService {
         
         try {
             connection = connectionFactory.getConnection();
-            connection.setAutoCommit(false);
-            pacienteRepository = new PacienteRepository(connection);
+            pacienteRepository = new PacienteRepository();
 
             consulta = pacienteRepository.getAllPacientes();
             
@@ -114,8 +107,7 @@ public class PacienteService {
             throw new DataBaseException(ex.getMessage());
         }
         finally {
-            if(connection != null)
-                connectionFactory.closeConnection(connection);
+            ConnectionFactory.closeConnection();
         }
         
         return retorno;
@@ -150,20 +142,16 @@ public class PacienteService {
                     .getIdPessoa();
             pacienteModel.setIdPessoa(idPessoa);
             
-            connection = connectionFactory.getConnection();
-            connection.setAutoCommit(false);
-            pacienteRepository = new PacienteRepository(connection);
+            pacienteRepository = new PacienteRepository();
 
             pacienteModel = pacienteRepository.updatePaciente(pacienteModel);
-            connection.commit();
+            ConnectionFactory.commit();
         } 
         catch (SQLException ex) {
-            connectionFactory.rollback(connection);
             throw new DataBaseException(ex.getMessage());
         } 
         finally {
-            if(connection != null)
-                connectionFactory.closeConnection(connection);
+            ConnectionFactory.closeConnection();
         }
         
         return PacienteDTO.pacienteDTOMapper(pacienteModel);
@@ -174,8 +162,7 @@ public class PacienteService {
         
          try {
             connection = connectionFactory.getConnection();
-            connection.setAutoCommit(false);
-            pacienteRepository = new PacienteRepository(connection);
+            pacienteRepository = new PacienteRepository();
 
             int retornoConsulta = pacienteRepository.desativaPaciente(id);
             if(retornoConsulta == 0) {
@@ -191,8 +178,7 @@ public class PacienteService {
             throw new DataBaseException(ex.getMessage());
         }
         finally {
-            if(connection != null)
-                connectionFactory.closeConnection(connection);
+            ConnectionFactory.closeConnection();
         }
         
         return retorno;

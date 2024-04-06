@@ -13,6 +13,7 @@ br\unipar\hospitalws\EnderecoWebServiceImp.class
 br\unipar\hospitalws\models\PessoaModel.class
 br\unipar\hospitalws\repositories\PessoaRepository.class
 br\unipar\hospitalws\DTO\EnderecoDTO.class
+br\unipar\hospitalws\exceptions\FormattingException.class
 br\unipar\hospitalws\DTO\PacienteDTO.class
 br\unipar\hospitalws\services\PacienteService.class
 br\unipar\hospitalws\enums\MotivoCancelamentoEnum.class

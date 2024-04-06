@@ -17,8 +17,8 @@ public class MedicoRepository {
     private Connection connection = null;
     private PessoaRepository pessoaRepository = null;
     
-    public MedicoRepository(Connection connection) throws SQLException {
-        this.connection = connection;
+    public MedicoRepository() throws SQLException {
+        this.connection = ConnectionFactory.getConnection();
         this.pessoaRepository = new PessoaRepository(this.connection);
     }
     

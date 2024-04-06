@@ -53,7 +53,7 @@ CREATE TABLE tb_consulta (
 	id_paciente INT NOT NULL,
 	horario_consulta TIMESTAMP NOT NULL,
 	st_cancelada BOOLEAN NOT NULL,
-	id_motivo_cancelamento int NOT NULL,
+	id_motivo_cancelamento INT,
 	FOREIGN KEY (id_medico) REFERENCES tb_medico(id),
 	FOREIGN KEY (id_paciente) REFERENCES tb_paciente(id),
 	FOREIGN KEY (id_motivo_cancelamento) REFERENCES tb_motivo_cancelamento(id)

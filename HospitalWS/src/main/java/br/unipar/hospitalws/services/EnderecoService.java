@@ -66,8 +66,7 @@ public class EnderecoService {
             throw new DataBaseException(ex.getMessage());
         }
         finally {
-            if(connection != null)
-                connectionFactory.closeConnection(connection);
+            ConnectionFactory.closeConnection();
         }
         
         return EnderecoDTO.enderecoDTOMapper(enderecoModel);
@@ -88,7 +87,7 @@ public class EnderecoService {
         } 
         finally {
             if(connection != null)
-                connectionFactory.closeConnection(connection);
+                ConnectionFactory.closeConnection();
         }
         
         return EnderecoDTO.enderecoDTOMapper(retorno);
@@ -114,8 +113,7 @@ public class EnderecoService {
             throw new DataBaseException(ex.getMessage());
         } 
         finally {
-            if(connection != null)
-                connectionFactory.closeConnection(connection);
+            ConnectionFactory.closeConnection();
         }
         
         return retorno;
@@ -136,8 +134,7 @@ public class EnderecoService {
             throw new DataBaseException(ex.getMessage());
         } 
         finally {
-            if(connection != null)
-                connectionFactory.closeConnection(connection);
+            ConnectionFactory.closeConnection();
         }
         
         return EnderecoDTO.enderecoDTOMapper(enderecoModel);
@@ -164,8 +161,7 @@ public class EnderecoService {
             throw new DataBaseException(ex.getMessage());
         } 
         finally {
-            if(connection != null)
-                connectionFactory.closeConnection(connection);
+            ConnectionFactory.closeConnection();
         }
         
         return retorno;

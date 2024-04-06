@@ -7,6 +7,6 @@ public class DataBaseException extends RuntimeException {
     String message;
 
     public DataBaseException(String message) {
-        super("Ops, um erro interno aconteceu: " + message);
+        super("Ops, um problema interno aconteceu: " + message);
     }
 }

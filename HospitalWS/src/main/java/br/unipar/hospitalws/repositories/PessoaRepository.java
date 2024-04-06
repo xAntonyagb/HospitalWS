@@ -2,8 +2,6 @@ package br.unipar.hospitalws.repositories;
 
 import br.unipar.hospitalws.exceptions.DataBaseException;
 import br.unipar.hospitalws.infrastructure.ConnectionFactory;
-import br.unipar.hospitalws.models.MedicoModel;
-import br.unipar.hospitalws.models.PacienteModel;
 import br.unipar.hospitalws.models.PessoaModel;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -42,7 +40,6 @@ public class PessoaRepository {
             if(rs.next()) {
                 pessoaModel.setIdPessoa(rs.getInt(1));
             }
-            connectionFactory.commit(connection);
         } 
         catch (SQLException ex) {
             throw new DataBaseException("(insertPessoa) "+ ex.getMessage());
@@ -66,7 +63,7 @@ public class PessoaRepository {
             rs = ps.executeQuery();
             
             if(rs.next()) {
-                pessoaModel = retornaPessoaInstance(rs);
+                pessoaModel = retornaPessoaInstance(rs, pessoaModel.getClass());
             }
         } 
         catch (SQLException ex) {
@@ -80,7 +77,7 @@ public class PessoaRepository {
         return pessoaModel;
     }
     
-    public ArrayList<PessoaModel> getAllPessoas() {
+    public ArrayList<PessoaModel> getAllPessoas(Class<? extends PessoaModel> tipoPessoa) {
         String sql = "SELECT *  FROM tb_pessoa"; 
         ArrayList<PessoaModel> listPessoas = new ArrayList<PessoaModel>();
         PreparedStatement ps = null;
@@ -91,7 +88,7 @@ public class PessoaRepository {
             rs = ps.executeQuery();
             
             while(rs.next()) {
-                listPessoas.add(retornaPessoaInstance(rs));
+                listPessoas.add(retornaPessoaInstance(rs, tipoPessoa));
             }
         } 
         catch (SQLException ex) {
@@ -147,9 +144,9 @@ public class PessoaRepository {
         }
     }
     
-    private PessoaModel retornaPessoaInstance(ResultSet rs) {
+    private PessoaModel retornaPessoaInstance(ResultSet rs, Class<? extends PessoaModel> tipoPessoa) {
         try {
-            PessoaModel pessoa = (PessoaModel) new MedicoModel(); // :)
+            PessoaModel pessoa = tipoPessoa.getDeclaredConstructor().newInstance();
             pessoa.setIdPessoa(rs.getInt(1));
             pessoa.setNome(rs.getString(2));
             pessoa.setGmail(rs.getString(3));
@@ -158,8 +155,8 @@ public class PessoaRepository {
             pessoa.setCpf(rs.getString(6));
             return pessoa;
         }
-        catch(SQLException ex) {
-            throw new DataBaseException("(retornaPessoaInstance) "+ ex.getMessage());
+        catch (Exception ex) {
+            throw new DataBaseException("erro ao obter retorno de pessoa");
         }
     }
     

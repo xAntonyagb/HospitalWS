@@ -5,7 +5,7 @@ import br.unipar.hospitalws.exceptions.DataBaseException;
 import br.unipar.hospitalws.exceptions.ValidationException;
 import jakarta.jws.WebMethod;
 import jakarta.jws.WebService;
-import java.util.ArrayList;
+import java.util.List;
 
 @WebService
 public interface ConsultaWebService {
@@ -17,7 +17,7 @@ public interface ConsultaWebService {
     ConsultaDTO getConsultaById(int id) throws ValidationException, DataBaseException;
     
     @WebMethod()
-    ArrayList<ConsultaDTO> getAllConsultas() throws ValidationException, DataBaseException;
+    List<ConsultaDTO> getAllConsultas() throws ValidationException, DataBaseException;
     
     @WebMethod()
     ConsultaDTO updateConsulta(ConsultaDTO consulta) throws ValidationException, DataBaseException;
