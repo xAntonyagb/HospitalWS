@@ -14,7 +14,10 @@ public class ConsultaModel {
     private boolean isCancelada;
     private int idConsulta;
 
-    public ConsultaModel() { }
+    public ConsultaModel() {
+        this.medico = new MedicoModel();
+        this.paciente = new PacienteModel();
+    }
 
     public ConsultaModel(PacienteModel paciente, MedicoModel medico, Timestamp horarioConsulta, MotivoCancelamentoEnum motivoCancelamento, boolean isCancelada, int id, int idConsulta) {
         this.paciente = paciente;
@@ -31,15 +34,18 @@ public class ConsultaModel {
         }
          
         ConsultaModel consultaModel = new ConsultaModel();
-        consultaModel.setPaciente(new PacienteModel());
-        consultaModel.setMedico(new MedicoModel());
         
         consultaModel.getMedico().setIdMedico(consultaDTO.getIdMedico());
         consultaModel.getPaciente().setIdPaciente(consultaDTO.getIdPaciente());
-        consultaModel.setHorarioConsulta(DateFormatterUtil.toTimestamp(consultaDTO.getHorarioConsulta()));
-        consultaModel.setMotivoCancelamento(consultaDTO.getMotivoCancelamento());
         consultaModel.setIdConsulta(consultaDTO.getId());
         
+        if(consultaDTO.getMotivoCancelamento() != null) {
+            consultaModel.setMotivoCancelamento(consultaDTO.getMotivoCancelamento());
+        }
+        if(consultaDTO.getHorarioConsulta() != null) {
+            consultaModel.setHorarioConsulta(DateFormatterUtil.toTimestamp(consultaDTO.getHorarioConsulta()));
+        }
+            
         return consultaModel;
     }
     

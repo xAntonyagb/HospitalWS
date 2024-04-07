@@ -30,6 +30,7 @@ br\unipar\hospitalws\DTO\ConsultaDTO.class
 br\unipar\hospitalws\DTO\MedicoDTO.class
 br\unipar\hospitalws\models\MedicoModel.class
 br\unipar\hospitalws\enums\EspecialidadeEnum.class
+br\unipar\hospitalws\exceptions\InternalException.class
 br\unipar\hospitalws\models\PacienteModel.class
 br\unipar\hospitalws\repositories\MedicoRepository.class
 br\unipar\hospitalws\models\MotivoCancelamentoModel.class

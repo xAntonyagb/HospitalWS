@@ -3,6 +3,7 @@ package br.unipar.hospitalws.services;
 import br.unipar.hospitalws.DTO.ConsultaDTO;
 import br.unipar.hospitalws.exceptions.DataBaseException;
 import br.unipar.hospitalws.exceptions.FormattingException;
+import br.unipar.hospitalws.exceptions.InternalException;
 import br.unipar.hospitalws.exceptions.ValidationException;
 import br.unipar.hospitalws.infrastructure.ConnectionFactory;
 import br.unipar.hospitalws.models.ConsultaModel;
@@ -54,7 +55,15 @@ public class ConsultaService {
         }
         catch(FormattingException ex) {
             logger.log(Level.SEVERE, "(insertConsulta) "+ ex.getMessage());
-            throw new ValidationException("Erro ao inserir a consulta: por favor informe uma data válida!");
+            throw new ValidationException("Erro ao inserir a consulta: Por favor informe uma data valida! (dd/MM/yyyy hh:mm:ss)");
+        }
+        catch(ValidationException ex) {
+            logger.log(Level.INFO, "(insertConsulta) Requisicao foi rejeitada pelo processo de validacao "+ ex.getMessage());
+            throw ex;
+        }
+        catch(Exception ex) {
+            logger.log(Level.SEVERE, "(insertConsulta) Um erro inesperado aconteceu: Nao foi possivel finalizar a execução desse metodo. "+ ex.getMessage());
+            throw new InternalException("cancelarConsulta");
         }
         finally {
             ConnectionFactory.closeConnection();
@@ -69,11 +78,22 @@ public class ConsultaService {
             ConsultaModel retorno = this.consultaRepository.getConsultaById(id);
             ConnectionFactory.commit();
             
+            if(retorno == null)
+                throw new ValidationException("Erro ao pesquisar consulta: Não foi encontrado nenhum registro dessa consulta!");
+            
             return ConsultaDTO.consultaDTOMapper(retorno);
         }
         catch(SQLException ex) {
             logger.log(Level.SEVERE, "(getConsultaById) "+ ex.getMessage());
             throw new DataBaseException("erro ao pesquisar pela consulta.");
+        }
+        catch(ValidationException ex) {
+            logger.log(Level.INFO, "(getConsultaById) Requisição foi rejeitada pelo processo de validação "+ ex.getMessage());
+            throw ex;
+        }
+        catch(Exception ex) {
+            logger.log(Level.SEVERE, "(getConsultaById) Um erro inesperado aconteceu: Nao foi possivel finalizar a execucao desse metodo. "+ ex.getMessage());
+            throw new InternalException("cancelarConsulta");
         }
         finally {
             ConnectionFactory.closeConnection();
@@ -99,6 +119,14 @@ public class ConsultaService {
             logger.log(Level.SEVERE, "(getAllConsultas) "+ ex.getMessage());
             throw new DataBaseException("erro ao pesquisar pelas consultas.");
         }
+        catch(ValidationException ex) {
+            logger.log(Level.INFO, "(getAllConsultas) Requisição foi rejeitada pelo processo de validação "+ ex.getMessage());
+            throw ex;
+        }
+        catch(Exception ex) {
+            logger.log(Level.SEVERE, "(getAllConsultas) Um erro inesperado aconteceu: Nao foi possivel finalizar a execucao desse metodo. "+ ex.getMessage());
+            throw new InternalException("cancelarConsulta");
+        }
         finally {
             ConnectionFactory.closeConnection();
         }
@@ -121,7 +149,15 @@ public class ConsultaService {
         }
         catch(FormattingException ex) {
             logger.log(Level.SEVERE, "(updateConsulta) "+ ex.getMessage());
-            throw new ValidationException("Erro ao atualizar a consulta: por favor informe uma data válida!");
+            throw new ValidationException("Erro ao atualizar a consulta: Por favor informe uma data valida! (dd/MM/yyyy hh:mm:ss)");
+        }
+        catch(ValidationException ex) {
+            logger.log(Level.INFO, "(updateConsulta) Requisição foi rejeitada pelo processo de validação "+ ex.getMessage());
+            throw ex;
+        }
+        catch(Exception ex) {
+            logger.log(Level.SEVERE, "(updateConsulta) Um erro inesperado aconteceu: Nao foi possivel finalizar a execucao desse metodo. "+ ex.getMessage());
+            throw new InternalException("cancelarConsulta");
         }
         finally {
             ConnectionFactory.closeConnection();
@@ -135,18 +171,27 @@ public class ConsultaService {
 
             ConsultaModel consultaModel = ajustaConsulta(consulta);
             validaCancelamento(consultaModel);
+            boolean isCancelada = this.consultaRepository.cancelarConsulta(consultaModel);
             
-            boolean retorno = this.consultaRepository.cancelarConsulta(consultaModel);
+            if(!isCancelada)
+                throw new ValidationException("Erro ao cancelar consulta: Essa consulta nao foi agendada ou ja foi cancelada!");
+
+            consultaModel = consultaRepository.getConsultaById(consulta.getId());
             ConnectionFactory.commit();
             
-            if(retorno)
-                throw new ValidationException("Erro ao cancelar consulta: não foi possivel encontrar essa consulta!");
-
             return ConsultaDTO.consultaDTOMapper(consultaModel);
         }
         catch(SQLException ex) {
             logger.log(Level.SEVERE, "(cancelarConsulta) "+ ex.getMessage());
             throw new DataBaseException("erro ao cancelar a consulta.");
+        }
+        catch(ValidationException ex) {
+            logger.log(Level.INFO, "(cancelarConsulta) Requisição foi rejeitada pelo processo de validação "+ ex.getMessage());
+            throw ex;
+        }
+        catch(Exception ex) {
+            logger.log(Level.SEVERE, "(cancelarConsulta) Um erro inesperado aconteceu: Nao foi possivel finalizar a execucao desse metodo. "+ ex.getMessage());
+            throw new InternalException("cancelarConsulta");
         }
         finally {
             ConnectionFactory.closeConnection();
@@ -187,15 +232,13 @@ public class ConsultaService {
     
     public void validaCancelamento(ConsultaModel consulta) throws SQLException {
         LocalDateTime agora = LocalDateTime.now();
+        ConsultaModel retorno = this.consultaRepository.getConsultaById(consulta.getIdConsulta());
         LocalDateTime horarioConsulta;
         
-        try {
-            horarioConsulta = DateFormatterUtil.toLocalDate(
-                    this.consultaRepository.getConsultaById(consulta.getIdConsulta())
-                            .getHorarioConsulta()
-            );
-        } catch(Exception ex) {
-            throw new ValidationException("Erro ao cancelar a consulta: Não foi possivel encontrar essa consulta");
+        if(retorno != null) {
+            horarioConsulta = DateFormatterUtil.toLocalDate(retorno.getHorarioConsulta());
+        } else {
+            throw new ValidationException("Erro ao cancelar a consulta: Não foi encontrado nenhum registro dessa consulta!");
         }
         
         LocalDateTime limiteCancelamento = horarioConsulta.minusHours(24);
@@ -204,7 +247,7 @@ public class ConsultaService {
             throw new ValidationException("Erro ao cancelar a consulta: Uma consulta somente poderá ser cancelada com antecedência mínima de 24 horas");
         }
         if(consulta.getMotivoCancelamento() == null) {
-            throw new ValidationException("Erro ao cancelar a consulta: Por favor informe um motivo de cancelamento válido");
+            throw new ValidationException("Erro ao cancelar a consulta: Por favor informe um motivo de cancelamento válido (OUTROS, MEDICO_CANCELOU, PACIENTE_DESISTIU)");
         }
     }
     
@@ -228,11 +271,14 @@ public class ConsultaService {
     }
     
     private boolean isAgendamentoComAntecedencia(LocalDateTime dataHoraConsulta) {
-        LocalDateTime horarioComAntecedencia = LocalDateTime.now().minusMinutes(30);
+        LocalDateTime horarioComAntecedencia = dataHoraConsulta.minusMinutes(30);
         
-        if(horarioComAntecedencia.isBefore(dataHoraConsulta)) {
+        if(LocalDateTime.now().isBefore(horarioComAntecedencia)) {
             return true;
-        } 
+        }
+        else if(LocalDateTime.now().isAfter(dataHoraConsulta)) {
+            throw new ValidationException("Erro ao marcar consulta: Por favor selecione uma data futura para a consulta.");
+        }
         
         throw new ValidationException("Erro ao marcar consulta: Você não pode marcar uma consulta com menos de 30 minutos de antecedencia!");
     } 
@@ -254,20 +300,43 @@ public class ConsultaService {
     }
     
     private boolean isMedicoDisponivel(ConsultaModel consulta) throws SQLException {
-        LocalDateTime horario = DateFormatterUtil.toLocalDate(consulta.getHorarioConsulta());
+        LocalDateTime horarioDesejado = DateFormatterUtil.toLocalDate(consulta.getHorarioConsulta());
         LocalDateTime inicioConsulta = null;
         LocalDateTime fimConsulta = null;
 
-        Timestamp retornoMedico = this.consultaRepository.getHoraConsultaByIdMedico(consulta.getMedico().getIdMedico());
+        List<Timestamp> retornoHorarios = this.consultaRepository.getHoraConsultaByIdMedico(consulta.getMedico().getIdMedico());
 
-        if (retornoMedico == null) { // se não houver agendamento
+        if (retornoHorarios == null) { // se não houver agendamento algum -> disponivel
             return true;
-        } else { // Verificar o horário se houver
-            inicioConsulta = DateFormatterUtil.toLocalDate(retornoMedico);
-            fimConsulta = DateFormatterUtil.toLocalDate(retornoMedico).plusHours(1);
+        } 
+        else { // Se não -> verificar os horários
+            
+            for(Timestamp agendametoMedico : retornoHorarios) { // Literando por todos os agendamentos desse médico
+                //Declarando auxiliares
+                inicioConsulta = DateFormatterUtil.toLocalDate(agendametoMedico);
+                fimConsulta = inicioConsulta.plusHours(1);
+                boolean isDuranteConsulta = false;
 
-            return horario.isBefore(inicioConsulta) || horario.isAfter(fimConsulta);
+                
+                //Verificar se o horario que o paciente deseja marcar está dentro de um horario já agendado
+                isDuranteConsulta = !(horarioDesejado.isBefore(inicioConsulta) || horarioDesejado.isAfter(fimConsulta));
+                boolean agendarDepoisDeOutraConsulta = horarioDesejado.isEqual(fimConsulta); //para permitir agendar consultas logo ao termino de outra
+                
+                if(isDuranteConsulta && !agendarDepoisDeOutraConsulta){
+                    return false;
+                }
+                
+                //Caso passe pela primeira validação, verificar se o horario que o paciente for marcar vai conflitar com um agendamento já existente
+                LocalDateTime fimHorarioDesejado = horarioDesejado.plusHours(1);
+                isDuranteConsulta = !(fimHorarioDesejado.isBefore(inicioConsulta) || fimHorarioDesejado.isAfter(fimConsulta));
+                boolean agendarAntesDeOutraConsulta = fimHorarioDesejado.isEqual(inicioConsulta); //para permitir agendar consultas logo antes ao inicio de outra
+                
+                if(isDuranteConsulta && !agendarAntesDeOutraConsulta){
+                    return false;
+                }
+            }
         }
+        return true;
     }
     
     private boolean isPacienteDisponivel(ConsultaModel consulta) throws SQLException {
@@ -278,23 +347,23 @@ public class ConsultaService {
         if (retornoPaciente == null) { // se não houver agendamento
             return true;
         } else { // Verificar se o paciente tem consulta hoje
-            boolean isConsultaHoje = horario.getDayOfMonth() == DateFormatterUtil.toLocalDate(retornoPaciente).getDayOfMonth();
-            return isConsultaHoje ? false : true;
+            boolean hasConsultaHoje = horario.getDayOfMonth() == DateFormatterUtil.toLocalDate(retornoPaciente).getDayOfMonth();
+            return hasConsultaHoje ? false : true;
         }
     }
     
     private boolean verificaDisponibilidade(ConsultaModel consulta) throws SQLException {
-        if(!isMedicoDisponivel(consulta))
-            throw new ValidationException("Erro ao marcar consulta: Esse médico já possui uma consulta marcada nesse horário. Tente marcar em outro horário!");
-            
         if(!isPacienteDisponivel(consulta))
             throw new ValidationException("Erro ao marcar consulta: Esse paciente já possui o máximo de uma consulta marcada hoje!");
+
+        if(!isMedicoDisponivel(consulta))
+            throw new ValidationException("Erro ao marcar consulta: Esse médico já possui uma consulta marcada nesse periodo de tempo. Tente marcar em outro horário!");
     
         return true;
     }
     
     private MedicoModel getMedicoAleatrio(LocalDateTime horaConsulta) throws SQLException { 
-        ArrayList<MedicoModel> listMedicos = this.consultaRepository.getMedicosDisponiveis(horaConsulta);
+        ArrayList<MedicoModel> listMedicos = this.consultaRepository.getMedicosDisponiveis(DateFormatterUtil.toTimestamp(horaConsulta));
         Random random = new Random();
         
         int posicao = random.nextInt(listMedicos.size());

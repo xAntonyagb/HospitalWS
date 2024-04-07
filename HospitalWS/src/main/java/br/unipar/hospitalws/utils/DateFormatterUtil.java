@@ -18,7 +18,7 @@ public class DateFormatterUtil {
         try {
             return Timestamp.valueOf(data);
         } catch (Exception ex) {
-            logger.log(Level.INFO, "Não foi possivel converter a data: Retornando nulo");
+            logger.log(Level.INFO, "(toTimestamp) Nao foi possivel converter para Timestamp: Retornando nulo");
             return null;
         }
      }
@@ -35,7 +35,7 @@ public class DateFormatterUtil {
             novo = novo.replaceAll("(\\d{2})(\\d{2})(\\d{4})(\\d{2})(\\d{2})(\\d{2})", "$3-$2-$1 $4:$5:$6");
             return Timestamp.valueOf(novo);
         } catch (Exception ex) {
-            logger.log(Level.INFO, "Não foi possivel converter a data: Retornando nulo");
+            logger.log(Level.INFO, "(toTimestamp) Nao foi possivel converter para Timestamp: Retornando nulo");
             return null;
         }
     }
@@ -47,7 +47,7 @@ public class DateFormatterUtil {
         try {
             return ajustaFormatoExibicao(data.toLocalDateTime());
         } catch (Exception ex) {
-            logger.log(Level.INFO, "Não foi possivel converter a data: Retornando nulo");
+            logger.log(Level.INFO, "(toLocalDate) Nao foi possivel converter para LocalDateTime: Retornando nulo");
             return null;
         }
     }
@@ -65,7 +65,7 @@ public class DateFormatterUtil {
             
             return ajustaFormatoExibicao(objetoData);
         } catch (Exception ex) {
-            logger.log(Level.INFO, "Não foi possivel converter a data: Retornando nulo");
+            logger.log(Level.INFO, "(toLocalDate) Nao foi possivel converter para LocalDateTime: Retornando nulo");
             return null;
         }
     }

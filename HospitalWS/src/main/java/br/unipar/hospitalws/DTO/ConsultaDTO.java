@@ -28,10 +28,13 @@ public class ConsultaDTO {
         ConsultaDTO consultaDTO = new ConsultaDTO();
         consultaDTO.setIdMedico(consultaModel.getMedico().getIdMedico());
         consultaDTO.setIdPaciente(consultaModel.getPaciente().getIdPaciente());
-        consultaDTO.setHorarioConsulta(consultaModel.getHorarioConsulta().toString()); //teste
         consultaDTO.setMotivoCancelamento(consultaModel.getMotivoCancelamento());
         consultaDTO.setId(consultaModel.getIdConsulta());
         
+        if(consultaModel.getHorarioConsulta() != null) {
+            consultaDTO.setHorarioConsulta(consultaModel.getHorarioConsulta().toString());
+        }
+            
         return consultaDTO;
     }
     

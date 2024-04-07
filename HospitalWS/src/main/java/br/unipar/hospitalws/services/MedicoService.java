@@ -6,6 +6,7 @@ import br.unipar.hospitalws.exceptions.ValidationException;
 import br.unipar.hospitalws.infrastructure.ConnectionFactory;
 import br.unipar.hospitalws.models.EnderecoModel;
 import br.unipar.hospitalws.models.MedicoModel;
+import br.unipar.hospitalws.repositories.ConsultaRepository;
 import br.unipar.hospitalws.repositories.EnderecoRepository;
 import br.unipar.hospitalws.repositories.MedicoRepository;
 import br.unipar.hospitalws.repositories.PessoaRepository;
@@ -21,6 +22,7 @@ public class MedicoService {
     private MedicoRepository medicoRepository = null;
     private PessoaRepository pessoaRepository = null;
     private EnderecoRepository enderecoRepository = null;
+    private ConsultaRepository consultaRepository = null;
 
     public MedicoService() {
         try {
@@ -177,6 +179,7 @@ public class MedicoService {
     public MedicoDTO desativaMedico(int id) {
         try {
             this.connection = connectionFactory.getConnection();
+            consultaRepository = new ConsultaRepository();
             
             boolean isDesativado = this.medicoRepository.desativaMedico(id);
             if(!isDesativado)
@@ -187,11 +190,12 @@ public class MedicoService {
             retorno.setId(id);
             retorno.setAtivo(false);
             
+            consultaRepository.cancelarConsultaByIdMedico(id);
             ConnectionFactory.commit();
             return retorno;
         } 
-        catch (DataBaseException ex) {
-            throw ex;
+        catch (SQLException ex) {
+            throw new DataBaseException(ex.getMessage());
         } 
         finally {
             ConnectionFactory.closeConnection();

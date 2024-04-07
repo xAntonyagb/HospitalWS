@@ -7,6 +7,7 @@ import br.unipar.hospitalws.exceptions.ValidationException;
 import br.unipar.hospitalws.infrastructure.ConnectionFactory;
 import br.unipar.hospitalws.models.EnderecoModel;
 import br.unipar.hospitalws.models.PacienteModel;
+import br.unipar.hospitalws.repositories.ConsultaRepository;
 import br.unipar.hospitalws.repositories.PacienteRepository;
 import br.unipar.hospitalws.utils.StringFormatterUtil;
 import java.sql.Connection;
@@ -20,6 +21,7 @@ public class PacienteService {
     private PacienteRepository pacienteRepository = null;
     private PessoaService pessoaService = new PessoaService();
     private EnderecoService enderecoService = new EnderecoService();
+    private ConsultaRepository consultaRepository = null;
     
     private PacienteModel ajustaPaciente(PacienteDTO paciente) {
         paciente.setBairro(StringFormatterUtil.ajustaNormalInput(paciente.getBairro()));
@@ -163,6 +165,7 @@ public class PacienteService {
          try {
             connection = connectionFactory.getConnection();
             pacienteRepository = new PacienteRepository();
+            consultaRepository = new ConsultaRepository();
 
             int retornoConsulta = pacienteRepository.desativaPaciente(id);
             if(retornoConsulta == 0) {
@@ -172,6 +175,7 @@ public class PacienteService {
             retorno.setId(id);
             retorno.setAtivo(false);
             
+            consultaRepository.cancelarConsultaByIdPaciente(id);
             connection.commit();
             
         } catch (SQLException ex) {
