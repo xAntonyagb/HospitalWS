@@ -150,7 +150,7 @@ public class ConsultaService {
         }
         catch(Exception ex) {
             logger.log(Level.SEVERE, "(updateConsulta) Um erro inesperado aconteceu: Nao foi possivel finalizar a execucao desse metodo. "+ ex.getMessage());
-            throw new InternalException("cancelarConsulta");
+            throw new InternalException("updateConsulta");
         }
         finally {
             ConnectionFactory.closeConnection();

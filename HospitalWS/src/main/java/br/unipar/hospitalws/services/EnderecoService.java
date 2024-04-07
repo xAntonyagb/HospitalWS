@@ -19,7 +19,7 @@ public class EnderecoService {
     private Connection connection = null;
     private EnderecoRepository enderecoRepository = null;
     
-    private final Logger logger = Logger.getLogger("EmderecoService");
+    private final Logger logger = Logger.getLogger("EnderecoService");
 
     public EnderecoDTO insertEndereco(EnderecoDTO enderecoDTO) {
         try {

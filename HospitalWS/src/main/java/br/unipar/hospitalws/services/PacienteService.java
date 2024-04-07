@@ -112,12 +112,12 @@ public class PacienteService {
             return retorno;
         } 
         catch(SQLException ex) {
-            logger.log(Level.SEVERE, "(getAllMedicos) "+ ex.getMessage());
-            throw new DataBaseException("erro ao pesquisar por médicos.");
+            logger.log(Level.SEVERE, "(getAllPacientes) "+ ex.getMessage());
+            throw new DataBaseException("erro ao pesquisar por pacientes.");
         }
         catch(Exception ex) {
-            logger.log(Level.SEVERE, "(getAllMedicos) Um erro inesperado aconteceu: Nao foi possivel finalizar a execução desse metodo. "+ ex.getMessage());
-            throw new InternalException("getAllMedicos");
+            logger.log(Level.SEVERE, "(getAllPacientes) Um erro inesperado aconteceu: Nao foi possivel finalizar a execução desse metodo. "+ ex.getMessage());
+            throw new InternalException("getAllPacientes");
         }
         finally {
             ConnectionFactory.closeConnection();
