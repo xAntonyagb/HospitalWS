@@ -7,8 +7,9 @@ import br.unipar.hospitalws.exceptions.ValidationException;
 import br.unipar.hospitalws.infrastructure.ConnectionFactory;
 import br.unipar.hospitalws.models.EnderecoModel;
 import br.unipar.hospitalws.models.PacienteModel;
+import br.unipar.hospitalws.repositories.ConsultaRepository;
 import br.unipar.hospitalws.repositories.PacienteRepository;
-import br.unipar.hospitalws.utils.StringValidatorUtil;
+import br.unipar.hospitalws.utils.StringFormatterUtil;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -20,19 +21,20 @@ public class PacienteService {
     private PacienteRepository pacienteRepository = null;
     private PessoaService pessoaService = new PessoaService();
     private EnderecoService enderecoService = new EnderecoService();
+    private ConsultaRepository consultaRepository = null;
     
     private PacienteModel ajustaPaciente(PacienteDTO paciente) {
-        paciente.setBairro(StringValidatorUtil.ajustaNormalInput(paciente.getBairro()));
-        paciente.setCEP(StringValidatorUtil.ajustaNormalInput(paciente.getCEP()));
-        paciente.setUF(StringValidatorUtil.ajustaNormalInput(paciente.getUF()));
-        paciente.setCidade(StringValidatorUtil.ajustaNormalInput(paciente.getCidade()));
-        paciente.setComplemento(StringValidatorUtil.ajustaNormalInput(paciente.getComplemento()));
-        paciente.setLogradouro(StringValidatorUtil.ajustaNormalInput(paciente.getLogradouro()));
-        paciente.setNome(StringValidatorUtil.ajustaNormalInput(paciente.getNome()));
-        paciente.setGmail(StringValidatorUtil.ajustaNormalInput(paciente.getGmail()));
-        paciente.setCpf(StringValidatorUtil.ajustaNumberInput(paciente.getCpf()));
-        paciente.setNumero(StringValidatorUtil.ajustaNumberInput(paciente.getNumero()));
-        paciente.setTelefone(StringValidatorUtil.ajustaNumberInput(paciente.getTelefone()));
+        paciente.setBairro(StringFormatterUtil.ajustaNormalInput(paciente.getBairro()));
+        paciente.setCEP(StringFormatterUtil.ajustaNormalInput(paciente.getCEP()));
+        paciente.setUF(StringFormatterUtil.ajustaNormalInput(paciente.getUF()));
+        paciente.setCidade(StringFormatterUtil.ajustaNormalInput(paciente.getCidade()));
+        paciente.setComplemento(StringFormatterUtil.ajustaNormalInput(paciente.getComplemento()));
+        paciente.setLogradouro(StringFormatterUtil.ajustaNormalInput(paciente.getLogradouro()));
+        paciente.setNome(StringFormatterUtil.ajustaNormalInput(paciente.getNome()));
+        paciente.setGmail(StringFormatterUtil.ajustaNormalInput(paciente.getGmail()));
+        paciente.setCpf(StringFormatterUtil.ajustaNumberInput(paciente.getCpf()));
+        paciente.setNumero(StringFormatterUtil.ajustaNumberInput(paciente.getNumero()));
+        paciente.setTelefone(StringFormatterUtil.ajustaNumberInput(paciente.getTelefone()));
         
         return PacienteModel.pacienteModelMapper(paciente);
     }
@@ -52,20 +54,16 @@ public class PacienteService {
                     .getIdPessoa();
             pacienteModel.setIdPessoa(idPessoa);
 
-            connection = connectionFactory.getConnection();
-            connection.setAutoCommit(false);
-            pacienteRepository = new PacienteRepository(connection);
+            pacienteRepository = new PacienteRepository();
 
             pacienteModel = pacienteRepository.insertPaciente(pacienteModel);
             connection.commit();
         } 
         catch (SQLException ex) {
-            connectionFactory.rollback(connection);
             throw new DataBaseException(ex.getMessage());
         } 
         finally {
-            if(connection != null)
-                connectionFactory.closeConnection(connection);
+            ConnectionFactory.closeConnection();
         }
         
         return PacienteDTO.pacienteDTOMapper(pacienteModel);
@@ -76,8 +74,7 @@ public class PacienteService {
         
         try {
             connection = connectionFactory.getConnection();
-            connection.setAutoCommit(false);
-            pacienteRepository = new PacienteRepository(connection);
+            pacienteRepository = new PacienteRepository();
 
             retorno = pacienteRepository.getPacienteById(id);
             connection.commit();
@@ -86,8 +83,7 @@ public class PacienteService {
             throw new DataBaseException(ex.getMessage());
         }
         finally {
-            if(connection != null)
-                connectionFactory.closeConnection(connection);
+            ConnectionFactory.closeConnection();
         }
         
         return PacienteDTO.pacienteDTOMapper(retorno);
@@ -99,8 +95,7 @@ public class PacienteService {
         
         try {
             connection = connectionFactory.getConnection();
-            connection.setAutoCommit(false);
-            pacienteRepository = new PacienteRepository(connection);
+            pacienteRepository = new PacienteRepository();
 
             consulta = pacienteRepository.getAllPacientes();
             
@@ -114,8 +109,7 @@ public class PacienteService {
             throw new DataBaseException(ex.getMessage());
         }
         finally {
-            if(connection != null)
-                connectionFactory.closeConnection(connection);
+            ConnectionFactory.closeConnection();
         }
         
         return retorno;
@@ -150,20 +144,16 @@ public class PacienteService {
                     .getIdPessoa();
             pacienteModel.setIdPessoa(idPessoa);
             
-            connection = connectionFactory.getConnection();
-            connection.setAutoCommit(false);
-            pacienteRepository = new PacienteRepository(connection);
+            pacienteRepository = new PacienteRepository();
 
             pacienteModel = pacienteRepository.updatePaciente(pacienteModel);
-            connection.commit();
+            ConnectionFactory.commit();
         } 
         catch (SQLException ex) {
-            connectionFactory.rollback(connection);
             throw new DataBaseException(ex.getMessage());
         } 
         finally {
-            if(connection != null)
-                connectionFactory.closeConnection(connection);
+            ConnectionFactory.closeConnection();
         }
         
         return PacienteDTO.pacienteDTOMapper(pacienteModel);
@@ -174,8 +164,8 @@ public class PacienteService {
         
          try {
             connection = connectionFactory.getConnection();
-            connection.setAutoCommit(false);
-            pacienteRepository = new PacienteRepository(connection);
+            pacienteRepository = new PacienteRepository();
+            consultaRepository = new ConsultaRepository();
 
             int retornoConsulta = pacienteRepository.desativaPaciente(id);
             if(retornoConsulta == 0) {
@@ -185,14 +175,14 @@ public class PacienteService {
             retorno.setId(id);
             retorno.setAtivo(false);
             
+            consultaRepository.cancelarConsultaByIdPaciente(id);
             connection.commit();
             
         } catch (SQLException ex) {
             throw new DataBaseException(ex.getMessage());
         }
         finally {
-            if(connection != null)
-                connectionFactory.closeConnection(connection);
+            ConnectionFactory.closeConnection();
         }
         
         return retorno;

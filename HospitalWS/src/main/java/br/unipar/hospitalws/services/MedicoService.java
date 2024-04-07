@@ -1,14 +1,16 @@
 package br.unipar.hospitalws.services;
 
-import br.unipar.hospitalws.DTO.EnderecoDTO;
 import br.unipar.hospitalws.DTO.MedicoDTO;
 import br.unipar.hospitalws.exceptions.DataBaseException;
 import br.unipar.hospitalws.exceptions.ValidationException;
 import br.unipar.hospitalws.infrastructure.ConnectionFactory;
 import br.unipar.hospitalws.models.EnderecoModel;
 import br.unipar.hospitalws.models.MedicoModel;
+import br.unipar.hospitalws.repositories.ConsultaRepository;
+import br.unipar.hospitalws.repositories.EnderecoRepository;
 import br.unipar.hospitalws.repositories.MedicoRepository;
-import br.unipar.hospitalws.utils.StringValidatorUtil;
+import br.unipar.hospitalws.repositories.PessoaRepository;
+import br.unipar.hospitalws.utils.StringFormatterUtil;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -18,115 +20,111 @@ public class MedicoService {
     private ConnectionFactory connectionFactory = new ConnectionFactory();
     private Connection connection = null;
     private MedicoRepository medicoRepository = null;
-    private PessoaService pessoaService = new PessoaService();;
-    private EnderecoService enderecoService = new EnderecoService();;
-    
-    private MedicoModel ajustaMedico(MedicoDTO medico) {
-        medico.setBairro(StringValidatorUtil.ajustaNormalInput(medico.getBairro()));
-        medico.setCEP(StringValidatorUtil.ajustaNormalInput(medico.getCEP()));
-        medico.setCRM(StringValidatorUtil.ajustaNormalInput(medico.getCRM()));
-        medico.setUF(StringValidatorUtil.ajustaNormalInput(medico.getUF()));
-        medico.setCidade(StringValidatorUtil.ajustaNormalInput(medico.getCidade()));
-        medico.setComplemento(StringValidatorUtil.ajustaNormalInput(medico.getComplemento()));
-        medico.setLogradouro(StringValidatorUtil.ajustaNormalInput(medico.getLogradouro()));
-        medico.setNome(StringValidatorUtil.ajustaNormalInput(medico.getNome()));
-        medico.setGmail(StringValidatorUtil.ajustaNormalInput(medico.getGmail()));
-        medico.setCpf(StringValidatorUtil.ajustaNumberInput(medico.getCpf()));
-        medico.setNumero(StringValidatorUtil.ajustaNumberInput(medico.getNumero()));
-        medico.setTelefone(StringValidatorUtil.ajustaNumberInput(medico.getTelefone()));
-        
-        return MedicoModel.medicoModelMapper(medico);
+    private PessoaRepository pessoaRepository = null;
+    private EnderecoRepository enderecoRepository = null;
+    private ConsultaRepository consultaRepository = null;
+
+    public MedicoService() {
+        try {
+            this.connection = connectionFactory.getConnection();
+            medicoRepository = new MedicoRepository();
+            pessoaRepository = new PessoaRepository(this.connection);
+            enderecoRepository = new EnderecoRepository(this.connection);
+        }
+        catch(SQLException ex) {
+            throw new DataBaseException(ex.getMessage());
+        }
     }
+    
     
     public MedicoDTO insertMedico(MedicoDTO medicoDTO) {
         MedicoModel medicoModel = ajustaMedico(medicoDTO);
         
         try {
-            EnderecoModel enderecoRetorno = EnderecoModel.enderecoModelMapper( //Converte para Model 
-                    enderecoService.insertEndereco( //Exige e retorna DTO 
-                            EnderecoDTO.enderecoDTOMapper(medicoModel.getEndereco() //Converte para DTO 
-                            )));
+             try {
+                this.connection = connectionFactory.getConnection();
+                this.medicoRepository = new MedicoRepository();
+                this.enderecoRepository = new EnderecoRepository(this.connection);
+            } catch (SQLException ex) { }
             
+            
+            EnderecoService.validaEndereco(medicoModel.getEndereco());
+            EnderecoModel enderecoRetorno = this.enderecoRepository.insertEndereco(medicoModel.getEndereco());
             medicoModel.setEndereco(enderecoRetorno);
+            ConnectionFactory.commit();
 
-            int idPessoa = pessoaService.insertPessoa(medicoModel, true)
+            PessoaService.validaPessoa(medicoModel);
+            int idPessoa = this.pessoaRepository.insertPessoa(medicoModel)
                     .getIdPessoa();
             medicoModel.setIdPessoa(idPessoa);
 
-            if(medicoModel.getCRM().length() != 12) {
+            if(medicoModel.getCRM() == null) {
+                throw new ValidationException("CRM inválido! Porfavor informe um CRM");
+            }
+            if(medicoModel.getCRM() != null && medicoModel.getCRM().length() != 12) {
                 throw new ValidationException("CRM inválido! Informe um CRM com 12 digitos (" + medicoModel.getCRM().length() + ")");
             }
             if(medicoModel.getEspecialidade() == null){
-                throw new ValidationException("Especialidade inválida! Porfavor informe um tipo de especialidade válida");
+                throw new ValidationException("Especialidade inválida! Porfavor informe um tipo de especialidade válida (DERMATOLOGIA, ORTOPEDIA, CARDIOLOGIA, GINECOLOGIA)");
             }
             
-            connection = connectionFactory.getConnection();
-            connection.setAutoCommit(false);
-            medicoRepository = new MedicoRepository(connection);
-
-            medicoModel = medicoRepository.insertMedico(medicoModel);
-            connection.commit();
+            medicoModel = this.medicoRepository.insertMedico(medicoModel);
+            ConnectionFactory.commit();
         } 
-        catch (SQLException ex) {
-            connectionFactory.rollback(connection);
-            throw new DataBaseException(ex.getMessage());
+        catch (DataBaseException ex) {
+            ConnectionFactory.closeConnection();
+            throw ex;
         } 
         finally {
-            if(connection != null)
-                connectionFactory.closeConnection(connection);
+            ConnectionFactory.closeConnection();
         }
         
         return MedicoDTO.medicoDTOMapper(medicoModel);
     }
     
     public MedicoDTO getMedicoById(int id) {
-        MedicoModel retorno = new MedicoModel();
-        
         try {
-            connection = connectionFactory.getConnection();
-            connection.setAutoCommit(false);
-            medicoRepository = new MedicoRepository(connection);
-
-            retorno = medicoRepository.getMedicoById(id);
-            connection.commit();
+            try {
+                this.connection = connectionFactory.getConnection();
+                this.medicoRepository = new MedicoRepository();
+            } catch (SQLException ex) { }
+            
+            MedicoModel retorno = this.medicoRepository.getMedicoById(id);
+            ConnectionFactory.commit();
+            return MedicoDTO.medicoDTOMapper(retorno);
         } 
-        catch (SQLException ex) {
-            connectionFactory.rollback(connection);
-            throw new DataBaseException(ex.getMessage());
+        catch (DataBaseException ex) {
+            throw ex;
         } 
         finally {
-            if(connection != null)
-                connectionFactory.closeConnection(connection);
+            ConnectionFactory.closeConnection();
         }
-        
-        return MedicoDTO.medicoDTOMapper(retorno);
     }
     
     public ArrayList<MedicoDTO> getAllMedicos() {
+        try {
+                this.connection = connectionFactory.getConnection();
+                this.medicoRepository = new MedicoRepository();
+            } catch (SQLException ex) { }
+            
         ArrayList<MedicoDTO> retorno = new ArrayList<MedicoDTO>();
         ArrayList<MedicoModel> consulta = new ArrayList<MedicoModel>();
-        
-        try {
-            connection = connectionFactory.getConnection();
-            connection.setAutoCommit(false);
-            medicoRepository = new MedicoRepository(connection);
 
-            consulta = medicoRepository.getAllMedicos();
+        try {
+            consulta = this.medicoRepository.getAllMedicos();
             
             for(MedicoModel medicoModel : consulta) {
-                medicoModel = (MedicoModel) pessoaService.getPessoaById(medicoModel);
+                medicoModel = (MedicoModel) this.pessoaRepository.getPessoaById(medicoModel);
                 retorno.add(MedicoDTO.medicoDTOMapper(medicoModel));
             }
             
-            connection.commit();
+            ConnectionFactory.commit();
         } 
-        catch (SQLException ex) {
-            connectionFactory.rollback(connection);
-            throw new DataBaseException(ex.getMessage());
+        catch (DataBaseException ex) {
+            throw ex;
         } 
         finally {
-            if(connection != null)
-                connectionFactory.closeConnection(connection);
+            ConnectionFactory.closeConnection();
         }
         
         return retorno;
@@ -136,11 +134,14 @@ public class MedicoService {
         MedicoModel medicoModel = ajustaMedico(medicoDTO);
         
         try {
-            EnderecoModel enderecoRetorno = EnderecoModel.enderecoModelMapper( //Converte para Model 
-                    enderecoService.updateEndereco( //Exige e retorna DTO 
-                            EnderecoDTO.enderecoDTOMapper(medicoModel.getEndereco() //Converte para DTO 
-                            )));
+            try {
+                this.connection = connectionFactory.getConnection();
+                this.medicoRepository = new MedicoRepository();
+                this.enderecoRepository = new EnderecoRepository(this.connection);
+            } catch (SQLException ex) { }
             
+            EnderecoService.validaEndereco(medicoModel.getEndereco());
+            EnderecoModel enderecoRetorno = this.enderecoRepository.updateEndereco(medicoModel.getEndereco());
             medicoModel.setEndereco(enderecoRetorno);
 
             if(medicoModel.getGmail() != null) {
@@ -152,68 +153,70 @@ public class MedicoService {
             if(medicoModel.getCRM() != null) {
                 throw new ValidationException("Você não pode atualizar o CRM de um médico!");
             }
-            
-            if(medicoModel.getCpf().length() != 11) {
+            if(medicoModel.getCpf() != null && medicoModel.getCpf().length() != 11) {
                 throw new ValidationException("CPF inválido! Informe um CPF com 11 digitos ("+ medicoModel.getCpf().length() +")");
             }
             if(medicoModel.getNome() == null){
                 throw new ValidationException("Nome inválido! Porfavor informe algum nome");
             }
-            if(medicoModel.getTelefone().length() < 9
-                    || medicoModel.getTelefone() == null){
+            if(medicoModel.getTelefone() == null || medicoModel.getTelefone().length() < 9){
                 throw new ValidationException("Telefone inválido! Porfavor informe um telefone com 9 digitos ("+ medicoModel.getTelefone().length() +")");
             }
-            
-            int idPessoa = pessoaService.updatePessoa(medicoModel, false)
-                    .getIdPessoa();
-            medicoModel.setIdPessoa(idPessoa);
-            
-            connection = connectionFactory.getConnection();
-            connection.setAutoCommit(false);
-            medicoRepository = new MedicoRepository(connection);
 
-            medicoModel = medicoRepository.updateMedico(medicoModel);
-            connection.commit();
+            medicoModel = this.medicoRepository.updateMedico(medicoModel);
+            ConnectionFactory.commit();
         } 
-        catch (SQLException ex) {
-            connectionFactory.rollback(connection);
-            throw new DataBaseException(ex.getMessage());
+        catch (DataBaseException ex) {
+            throw ex;
         } 
         finally {
-            if(connection != null)
-                connectionFactory.closeConnection(connection);
+            ConnectionFactory.closeConnection();
         }
         
         return MedicoDTO.medicoDTOMapper(medicoModel);
     }
     
     public MedicoDTO desativaMedico(int id) {
-        MedicoDTO retorno = new MedicoDTO();
-        
         try {
-            connection = new ConnectionFactory().getConnection();
-            connection.setAutoCommit(false);
-            medicoRepository = new MedicoRepository(connection);
-
-            int retornoConsulta = medicoRepository.desativaMedico(id);
-            if(retornoConsulta == 0) {
-                throw new ValidationException("Erro ao deletar: Não foi possivel encontrar esse médico");
-            }
+            this.connection = connectionFactory.getConnection();
+            consultaRepository = new ConsultaRepository();
             
+            boolean isDesativado = this.medicoRepository.desativaMedico(id);
+            if(!isDesativado)
+                throw new ValidationException("Erro ao desativar: Não foi possivel encontrar esse médico");
+            
+            
+            MedicoDTO retorno = new MedicoDTO();
             retorno.setId(id);
             retorno.setAtivo(false);
-            connection.commit();
+            
+            consultaRepository.cancelarConsultaByIdMedico(id);
+            ConnectionFactory.commit();
+            return retorno;
         } 
         catch (SQLException ex) {
-            connectionFactory.rollback(connection);
             throw new DataBaseException(ex.getMessage());
         } 
         finally {
-            if(connection != null)
-                connectionFactory.closeConnection(connection);
+            ConnectionFactory.closeConnection();
         }
+    }
+    
+    private MedicoModel ajustaMedico(MedicoDTO medico) {
+        medico.setBairro(StringFormatterUtil.ajustaNormalInput(medico.getBairro()));
+        medico.setCEP(StringFormatterUtil.ajustaNormalInput(medico.getCEP()));
+        medico.setCRM(StringFormatterUtil.ajustaNormalInput(medico.getCRM()));
+        medico.setUF(StringFormatterUtil.ajustaNormalInput(medico.getUF()));
+        medico.setCidade(StringFormatterUtil.ajustaNormalInput(medico.getCidade()));
+        medico.setComplemento(StringFormatterUtil.ajustaNormalInput(medico.getComplemento()));
+        medico.setLogradouro(StringFormatterUtil.ajustaNormalInput(medico.getLogradouro()));
+        medico.setNome(StringFormatterUtil.ajustaNormalInput(medico.getNome()));
+        medico.setGmail(StringFormatterUtil.ajustaNormalInput(medico.getGmail()));
+        medico.setCpf(StringFormatterUtil.ajustaNumberInput(medico.getCpf()));
+        medico.setNumero(StringFormatterUtil.ajustaNumberInput(medico.getNumero()));
+        medico.setTelefone(StringFormatterUtil.ajustaNumberInput(medico.getTelefone()));
         
-        return retorno;
+        return MedicoModel.medicoModelMapper(medico);
     }
     
 }

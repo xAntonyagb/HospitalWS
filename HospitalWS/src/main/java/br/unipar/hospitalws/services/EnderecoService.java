@@ -6,7 +6,7 @@ import br.unipar.hospitalws.exceptions.ValidationException;
 import br.unipar.hospitalws.infrastructure.ConnectionFactory;
 import br.unipar.hospitalws.models.EnderecoModel;
 import br.unipar.hospitalws.repositories.EnderecoRepository;
-import br.unipar.hospitalws.utils.StringValidatorUtil;
+import br.unipar.hospitalws.utils.StringFormatterUtil;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -39,13 +39,13 @@ public class EnderecoService {
     }
     
     private EnderecoModel ajustaEndereco(EnderecoDTO endereco) {
-        endereco.setBairro(StringValidatorUtil.ajustaNormalInput(endereco.getBairro()));
-        endereco.setLogradouro(StringValidatorUtil.ajustaNormalInput(endereco.getLogradouro()));
-        endereco.setUF(StringValidatorUtil.ajustaNormalInput(endereco.getUF()));
-        endereco.setCidade(StringValidatorUtil.ajustaNormalInput(endereco.getCidade()));
-        endereco.setCEP(StringValidatorUtil.ajustaNormalInput(endereco.getCEP()));
-        endereco.setComplemento(StringValidatorUtil.ajustaNormalInput(endereco.getComplemento()));
-        endereco.setNumero(StringValidatorUtil.ajustaNumberInput(endereco.getNumero()));
+        endereco.setBairro(StringFormatterUtil.ajustaNormalInput(endereco.getBairro()));
+        endereco.setLogradouro(StringFormatterUtil.ajustaNormalInput(endereco.getLogradouro()));
+        endereco.setUF(StringFormatterUtil.ajustaNormalInput(endereco.getUF()));
+        endereco.setCidade(StringFormatterUtil.ajustaNormalInput(endereco.getCidade()));
+        endereco.setCEP(StringFormatterUtil.ajustaNormalInput(endereco.getCEP()));
+        endereco.setComplemento(StringFormatterUtil.ajustaNormalInput(endereco.getComplemento()));
+        endereco.setNumero(StringFormatterUtil.ajustaNumberInput(endereco.getNumero()));
         
         return EnderecoModel.enderecoModelMapper(endereco);
     }
@@ -66,8 +66,7 @@ public class EnderecoService {
             throw new DataBaseException(ex.getMessage());
         }
         finally {
-            if(connection != null)
-                connectionFactory.closeConnection(connection);
+            ConnectionFactory.closeConnection();
         }
         
         return EnderecoDTO.enderecoDTOMapper(enderecoModel);
@@ -88,7 +87,7 @@ public class EnderecoService {
         } 
         finally {
             if(connection != null)
-                connectionFactory.closeConnection(connection);
+                ConnectionFactory.closeConnection();
         }
         
         return EnderecoDTO.enderecoDTOMapper(retorno);
@@ -114,8 +113,7 @@ public class EnderecoService {
             throw new DataBaseException(ex.getMessage());
         } 
         finally {
-            if(connection != null)
-                connectionFactory.closeConnection(connection);
+            ConnectionFactory.closeConnection();
         }
         
         return retorno;
@@ -136,14 +134,13 @@ public class EnderecoService {
             throw new DataBaseException(ex.getMessage());
         } 
         finally {
-            if(connection != null)
-                connectionFactory.closeConnection(connection);
+            ConnectionFactory.closeConnection();
         }
         
         return EnderecoDTO.enderecoDTOMapper(enderecoModel);
     }
     
-    public EnderecoDTO deleteEnderecoById(int id) {
+    public EnderecoDTO deleteEndereco(int id) {
         EnderecoDTO retorno = new EnderecoDTO();
         
         
@@ -152,7 +149,7 @@ public class EnderecoService {
             connection.setAutoCommit(false);
             enderecoRepository = new EnderecoRepository(connection);
             
-            int retornoConsulta = enderecoRepository.deleteEnderecoById(id);
+            int retornoConsulta = enderecoRepository.deleteEndereco(id);
             
             if(retornoConsulta == 0) {
                 throw new ValidationException("Erro ao deletar: Não foi possivel encontrar esse endereço");
@@ -164,8 +161,7 @@ public class EnderecoService {
             throw new DataBaseException(ex.getMessage());
         } 
         finally {
-            if(connection != null)
-                connectionFactory.closeConnection(connection);
+            ConnectionFactory.closeConnection();
         }
         
         return retorno;

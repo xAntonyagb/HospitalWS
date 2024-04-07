@@ -48,8 +48,7 @@ public class PessoaService {
             throw new DataBaseException(ex.getMessage());
         } 
         finally {
-            if(connection != null)
-                connectionFactory.closeConnection(connection);
+            ConnectionFactory.closeConnection();
         }
         
         return retorno;
@@ -69,14 +68,13 @@ public class PessoaService {
             throw new DataBaseException(ex.getMessage());
         }
         finally {
-            if(connection != null)
-                connectionFactory.closeConnection(connection);
+            ConnectionFactory.closeConnection();
         }
         
         return retorno;
     }
     
-    public ArrayList<PessoaModel> getAllPessoas() {
+    public ArrayList<PessoaModel> getAllPessoas(Class<? extends PessoaModel> tipoPessoa) {
         ArrayList<PessoaModel> retorno = null;
         
         try {
@@ -84,13 +82,12 @@ public class PessoaService {
             connection.setAutoCommit(false);
             pessoaRepository = new PessoaRepository(connection);
 
-            retorno = pessoaRepository.getAllPessoas();
+            retorno = pessoaRepository.getAllPessoas(tipoPessoa);
         } catch (SQLException ex) {
             throw new DataBaseException(ex.getMessage());
         }
         finally {
-            if(connection != null)
-                connectionFactory.closeConnection(connection);
+            ConnectionFactory.closeConnection();
         }
         
         return retorno;
@@ -108,12 +105,12 @@ public class PessoaService {
             pessoaRepository = new PessoaRepository(connection);
 
             retorno = pessoaRepository.updatePessoa(pessoaModel);
+            this.connection.commit();
         } catch (SQLException ex) {
             throw new DataBaseException(ex.getMessage());
         }
         finally {
-            if(connection != null)
-                connectionFactory.closeConnection(connection);
+            ConnectionFactory.closeConnection();
         }
         
         return retorno;
@@ -131,8 +128,7 @@ public class PessoaService {
             throw new DataBaseException(ex.getMessage());
         }
         finally {
-            if(connection != null)
-                connectionFactory.closeConnection(connection);
+            ConnectionFactory.closeConnection();
         }
     }
     

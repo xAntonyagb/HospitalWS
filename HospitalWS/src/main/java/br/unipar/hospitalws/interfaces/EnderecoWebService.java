@@ -23,6 +23,6 @@ public interface EnderecoWebService {
     EnderecoDTO updateEndereco(EnderecoDTO enndereco) throws ValidationException, DataBaseException;
     
     @WebMethod()
-    EnderecoDTO deleteEnderecoById(int id) throws ValidationException, DataBaseException;
+    EnderecoDTO deleteEndereco(int id) throws ValidationException, DataBaseException;
     
 }

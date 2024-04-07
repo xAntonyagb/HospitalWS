@@ -34,8 +34,8 @@ public class EnderecoWebServiceImp implements EnderecoWebService{
     }
 
     @Override
-    public EnderecoDTO deleteEnderecoById(int id) throws ValidationException, DataBaseException {
-        return enderecoService.deleteEnderecoById(id);
+    public EnderecoDTO deleteEndereco(int id) throws ValidationException, DataBaseException {
+        return enderecoService.deleteEndereco(id);
     }
     
 }
