@@ -2,6 +2,7 @@ package br.unipar.hospitalws.services;
 
 import br.unipar.hospitalws.DTO.MedicoDTO;
 import br.unipar.hospitalws.exceptions.DataBaseException;
+import br.unipar.hospitalws.exceptions.InternalException;
 import br.unipar.hospitalws.exceptions.ValidationException;
 import br.unipar.hospitalws.infrastructure.ConnectionFactory;
 import br.unipar.hospitalws.models.EnderecoModel;
@@ -14,88 +15,76 @@ import br.unipar.hospitalws.utils.StringFormatterUtil;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class MedicoService {
     
-    private ConnectionFactory connectionFactory = new ConnectionFactory();
     private Connection connection = null;
     private MedicoRepository medicoRepository = null;
     private PessoaRepository pessoaRepository = null;
     private EnderecoRepository enderecoRepository = null;
     private ConsultaRepository consultaRepository = null;
 
-    public MedicoService() {
-        try {
-            this.connection = connectionFactory.getConnection();
-            medicoRepository = new MedicoRepository();
-            pessoaRepository = new PessoaRepository(this.connection);
-            enderecoRepository = new EnderecoRepository(this.connection);
-        }
-        catch(SQLException ex) {
-            throw new DataBaseException(ex.getMessage());
-        }
-    }
+    private final Logger logger = Logger.getLogger("MedicoService");
     
     
     public MedicoDTO insertMedico(MedicoDTO medicoDTO) {
-        MedicoModel medicoModel = ajustaMedico(medicoDTO);
-        
         try {
-             try {
-                this.connection = connectionFactory.getConnection();
-                this.medicoRepository = new MedicoRepository();
-                this.enderecoRepository = new EnderecoRepository(this.connection);
-            } catch (SQLException ex) { }
+            MedicoModel medicoModel = ajustaMedico(medicoDTO);
+            validaInsertMedico(medicoModel);
             
+            this.connection = ConnectionFactory.getConnection();
+            this.enderecoRepository = new EnderecoRepository();
+            this.pessoaRepository = new PessoaRepository();
+            this.medicoRepository = new MedicoRepository();
             
-            EnderecoService.validaEndereco(medicoModel.getEndereco());
             EnderecoModel enderecoRetorno = this.enderecoRepository.insertEndereco(medicoModel.getEndereco());
             medicoModel.setEndereco(enderecoRetorno);
-            ConnectionFactory.commit();
 
-            PessoaService.validaPessoa(medicoModel);
-            int idPessoa = this.pessoaRepository.insertPessoa(medicoModel)
-                    .getIdPessoa();
+            int idPessoa = this.pessoaRepository.insertPessoa(medicoModel).getIdPessoa();
             medicoModel.setIdPessoa(idPessoa);
-
-            if(medicoModel.getCRM() == null) {
-                throw new ValidationException("CRM inválido! Porfavor informe um CRM");
-            }
-            if(medicoModel.getCRM() != null && medicoModel.getCRM().length() != 12) {
-                throw new ValidationException("CRM inválido! Informe um CRM com 12 digitos (" + medicoModel.getCRM().length() + ")");
-            }
-            if(medicoModel.getEspecialidade() == null){
-                throw new ValidationException("Especialidade inválida! Porfavor informe um tipo de especialidade válida (DERMATOLOGIA, ORTOPEDIA, CARDIOLOGIA, GINECOLOGIA)");
-            }
             
-            medicoModel = this.medicoRepository.insertMedico(medicoModel);
+            int idMedico = this.medicoRepository.insertMedico(medicoModel);
+            medicoModel.setIdMedico(idMedico);
+            
             ConnectionFactory.commit();
-        } 
-        catch (DataBaseException ex) {
-            ConnectionFactory.closeConnection();
+            return MedicoDTO.medicoDTOMapper(medicoModel);
+        }
+        catch(SQLException ex) {
+            logger.log(Level.SEVERE, "(insertMedico) "+ ex.getMessage());
+            throw new DataBaseException("erro ao inserir um novo médico.");
+        }
+        catch(ValidationException ex) {
+            logger.log(Level.INFO, "(insertMedico) Requisicao foi rejeitada pelo processo de validacao "+ ex.getMessage());
             throw ex;
-        } 
+        }
+        catch(Exception ex) {
+            logger.log(Level.SEVERE, "(insertMedico) Um erro inesperado aconteceu: Nao foi possivel finalizar a execução desse metodo. "+ ex.getMessage());
+            throw new InternalException("insertMedico");
+        }
         finally {
             ConnectionFactory.closeConnection();
         }
-        
-        return MedicoDTO.medicoDTOMapper(medicoModel);
     }
     
     public MedicoDTO getMedicoById(int id) {
         try {
-            try {
-                this.connection = connectionFactory.getConnection();
-                this.medicoRepository = new MedicoRepository();
-            } catch (SQLException ex) { }
+            this.connection = ConnectionFactory.getConnection();
+            this.medicoRepository = new MedicoRepository();
             
             MedicoModel retorno = this.medicoRepository.getMedicoById(id);
             ConnectionFactory.commit();
             return MedicoDTO.medicoDTOMapper(retorno);
         } 
-        catch (DataBaseException ex) {
-            throw ex;
-        } 
+        catch(SQLException ex) {
+            logger.log(Level.SEVERE, "(getMedicoById) "+ ex.getMessage());
+            throw new DataBaseException("erro ao pesquisar por médico.");
+        }
+        catch(Exception ex) {
+            logger.log(Level.SEVERE, "(getMedicoById) Um erro inesperado aconteceu: Nao foi possivel finalizar a execução desse metodo. "+ ex.getMessage());
+            throw new InternalException("getMedicoById");
+        }
         finally {
             ConnectionFactory.closeConnection();
         }
@@ -103,100 +92,103 @@ public class MedicoService {
     
     public ArrayList<MedicoDTO> getAllMedicos() {
         try {
-                this.connection = connectionFactory.getConnection();
-                this.medicoRepository = new MedicoRepository();
-            } catch (SQLException ex) { }
+            this.connection = ConnectionFactory.getConnection();
+            this.medicoRepository = new MedicoRepository();
             
-        ArrayList<MedicoDTO> retorno = new ArrayList<MedicoDTO>();
-        ArrayList<MedicoModel> consulta = new ArrayList<MedicoModel>();
+            ArrayList<MedicoDTO> retorno = new ArrayList<MedicoDTO>();
+            ArrayList<MedicoModel> retornoConsulta = new ArrayList<MedicoModel>();
 
-        try {
-            consulta = this.medicoRepository.getAllMedicos();
+            retornoConsulta = this.medicoRepository.getAllMedicos();
             
-            for(MedicoModel medicoModel : consulta) {
+            for(MedicoModel medicoModel : retornoConsulta) {
                 medicoModel = (MedicoModel) this.pessoaRepository.getPessoaById(medicoModel);
                 retorno.add(MedicoDTO.medicoDTOMapper(medicoModel));
             }
             
             ConnectionFactory.commit();
+            return retorno;
         } 
-        catch (DataBaseException ex) {
-            throw ex;
-        } 
+        catch(SQLException ex) {
+            logger.log(Level.SEVERE, "(getAllMedicos) "+ ex.getMessage());
+            throw new DataBaseException("erro ao pesquisar por médicos.");
+        }
+        catch(Exception ex) {
+            logger.log(Level.SEVERE, "(getAllMedicos) Um erro inesperado aconteceu: Nao foi possivel finalizar a execução desse metodo. "+ ex.getMessage());
+            throw new InternalException("getAllMedicos");
+        }
         finally {
             ConnectionFactory.closeConnection();
         }
-        
-        return retorno;
     }
     
     public MedicoDTO updateMedico(MedicoDTO medicoDTO) {
-        MedicoModel medicoModel = ajustaMedico(medicoDTO);
-        
         try {
-            try {
-                this.connection = connectionFactory.getConnection();
-                this.medicoRepository = new MedicoRepository();
-                this.enderecoRepository = new EnderecoRepository(this.connection);
-            } catch (SQLException ex) { }
+            MedicoModel medicoModel = ajustaMedico(medicoDTO);
+            validaUpdateMedico(medicoModel);
             
-            EnderecoService.validaEndereco(medicoModel.getEndereco());
-            EnderecoModel enderecoRetorno = this.enderecoRepository.updateEndereco(medicoModel.getEndereco());
-            medicoModel.setEndereco(enderecoRetorno);
+            this.connection = ConnectionFactory.getConnection();
+            this.pessoaRepository = new PessoaRepository();
+            this.medicoRepository = new MedicoRepository();
 
-            if(medicoModel.getGmail() != null) {
-                throw new ValidationException("Você não pode atualizar o email de um médico!");
-            }
-            if(medicoModel.getEspecialidade() != null) {
-                throw new ValidationException("Você não pode atualizar a especialidade de um médico!");
-            }
-            if(medicoModel.getCRM() != null) {
-                throw new ValidationException("Você não pode atualizar o CRM de um médico!");
-            }
-            if(medicoModel.getCpf() != null && medicoModel.getCpf().length() != 11) {
-                throw new ValidationException("CPF inválido! Informe um CPF com 11 digitos ("+ medicoModel.getCpf().length() +")");
-            }
-            if(medicoModel.getNome() == null){
-                throw new ValidationException("Nome inválido! Porfavor informe algum nome");
-            }
-            if(medicoModel.getTelefone() == null || medicoModel.getTelefone().length() < 9){
-                throw new ValidationException("Telefone inválido! Porfavor informe um telefone com 9 digitos ("+ medicoModel.getTelefone().length() +")");
-            }
+            MedicoModel pessoaRetorno = (MedicoModel) this.pessoaRepository.updatePessoa(medicoModel);
+            medicoModel.setIdPessoa(pessoaRetorno.getIdPessoa());
+            medicoModel.setNome(pessoaRetorno.getNome());
+            medicoModel.setTelefone(pessoaRetorno.getTelefone());
+            medicoModel.setEndereco(pessoaRetorno.getEndereco());
 
             medicoModel = this.medicoRepository.updateMedico(medicoModel);
+            
             ConnectionFactory.commit();
+            return MedicoDTO.medicoDTOMapper(medicoModel);
         } 
-        catch (DataBaseException ex) {
+        catch(SQLException ex) {
+            logger.log(Level.SEVERE, "(updateMedico) "+ ex.getMessage());
+            throw new DataBaseException("erro ao atualizar cadastro de médico.");
+        }
+        catch(ValidationException ex) {
+            logger.log(Level.INFO, "(updateMedico) Requisicao foi rejeitada pelo processo de validacao "+ ex.getMessage());
             throw ex;
-        } 
+        }
+        catch(Exception ex) {
+            logger.log(Level.SEVERE, "(updateMedico) Um erro inesperado aconteceu: Nao foi possivel finalizar a execução desse metodo. "+ ex.getMessage());
+            throw new InternalException("updateMedico");
+        }
         finally {
             ConnectionFactory.closeConnection();
         }
-        
-        return MedicoDTO.medicoDTOMapper(medicoModel);
     }
     
     public MedicoDTO desativaMedico(int id) {
         try {
-            this.connection = connectionFactory.getConnection();
-            consultaRepository = new ConsultaRepository();
+            this.connection = ConnectionFactory.getConnection();
+            this.consultaRepository = new ConsultaRepository();
             
             boolean isDesativado = this.medicoRepository.desativaMedico(id);
-            if(!isDesativado)
+            if(!isDesativado) {
                 throw new ValidationException("Erro ao desativar: Não foi possivel encontrar esse médico");
-            
-            
+            }
+                
             MedicoDTO retorno = new MedicoDTO();
             retorno.setId(id);
             retorno.setAtivo(false);
             
-            consultaRepository.cancelarConsultaByIdMedico(id);
+            this.consultaRepository.cancelarConsultaByIdMedico(id);
             ConnectionFactory.commit();
+            
             return retorno;
         } 
-        catch (SQLException ex) {
-            throw new DataBaseException(ex.getMessage());
-        } 
+        catch(SQLException ex) {
+            logger.log(Level.SEVERE, "(desativaMedico) "+ ex.getMessage());
+            throw new DataBaseException("erro ao desativar médico.");
+        }
+        catch(ValidationException ex) {
+            logger.log(Level.INFO, "(updateMedico) Requisicao foi rejeitada pelo processo de validacao "+ ex.getMessage());
+            throw ex;
+        }
+        catch(Exception ex) {
+            logger.log(Level.SEVERE, "(desativaMedico) Um erro inesperado aconteceu: Nao foi possivel finalizar a execução desse metodo. "+ ex.getMessage());
+            throw new InternalException("desativaMedico");
+        }
         finally {
             ConnectionFactory.closeConnection();
         }
@@ -217,6 +209,28 @@ public class MedicoService {
         medico.setTelefone(StringFormatterUtil.ajustaNumberInput(medico.getTelefone()));
         
         return MedicoModel.medicoModelMapper(medico);
+    }
+
+    private void validaInsertMedico(MedicoModel medicoModel) {
+        PessoaService.validaInsertPessoa(medicoModel);
+            
+        if(medicoModel.getCRM() == null || medicoModel.getCRM().length() != 12) {
+            throw new ValidationException("CRM inválido! Informe um CRM com 12 digitos");
+        }
+        if(medicoModel.getEspecialidade() == null){
+            throw new ValidationException("Especialidade inválida! Porfavor informe um tipo de especialidade válida (DERMATOLOGIA, ORTOPEDIA, CARDIOLOGIA, GINECOLOGIA)");
+        }
+    }
+
+    private void validaUpdateMedico(MedicoModel medicoModel) {
+        PessoaService.validaUpdatePessoa(medicoModel);
+            
+        if(medicoModel.getEspecialidade() != null) {
+            throw new ValidationException("Você não pode atualizar a especialidade de um médico!");
+        }
+        if(medicoModel.getCRM() != null) {
+            throw new ValidationException("Você não pode atualizar o CRM de um médico!");
+        }
     }
     
 }

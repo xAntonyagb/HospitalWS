@@ -1,11 +1,12 @@
 package br.unipar.hospitalws.repositories;
 
-import br.unipar.hospitalws.exceptions.DataBaseException;
+import br.unipar.hospitalws.exceptions.DataBasePessoaException;
 import br.unipar.hospitalws.infrastructure.ConnectionFactory;
 import br.unipar.hospitalws.models.PacienteModel;
 
 import java.sql.*;
 import java.util.ArrayList;
+import java.util.List;
 
 public class PacienteRepository {
 
@@ -14,145 +15,116 @@ public class PacienteRepository {
     
     public PacienteRepository() throws SQLException {
         this.connection = ConnectionFactory.getConnection();
-        pessoaRepository = new PessoaRepository(connection);
+        this.pessoaRepository = new PessoaRepository();
     }
     
-    public PacienteModel insertPaciente(PacienteModel pacienteModel) {
+    public int insertPaciente(PacienteModel pacienteModel) throws SQLException {
         String sql = "INSERT INTO tb_paciente (id_pessoa, st_ativo) VALUES(?, ?)";
-        PreparedStatement ps = null;
-        ResultSet rs = null;
 
-        try {
-            ps = this.connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
+        try (PreparedStatement ps = this.connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             ps.setInt(1, pacienteModel.getIdPessoa());
             ps.setBoolean(2, true);
             ps.executeUpdate();
 
-            rs = ps.getGeneratedKeys();
-
-            rs.next();
-            pacienteModel.setIdPaciente(rs.getInt(1));
-            return pacienteModel;
-
-        } catch (SQLException ex) {
-            throw new DataBaseException(ex.getMessage());
+            try (ResultSet rs = ps.getGeneratedKeys()) {
+                if(rs.next()) {
+                    return rs.getInt(1);
+                }
+            }
         }
+        return 0;
     }
     
-    public PacienteModel getPacienteById(int id) {
+    public PacienteModel getPacienteById(int id) throws SQLException, DataBasePessoaException {
         String sql = "SELECT * FROM tb_paciente "
                 + "WHERE id = ?";
-        PreparedStatement ps = null;
-        ResultSet rs = null;
         
-        try {
-            ps = this.connection.prepareStatement(sql);
+        try (PreparedStatement ps = this.connection.prepareStatement(sql)) {
             ps.setInt(1, id);
-            rs = ps.executeQuery();
+
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    PacienteModel pacienteModel = new PacienteModel();
+                    pacienteModel.setIdPessoa(rs.getInt("id_pessoa"));
+                    pacienteModel = (PacienteModel) pessoaRepository.getPessoaById(pacienteModel);
+                    pacienteModel.setAtivo(rs.getBoolean("st_ativo"));
+                    pacienteModel.setIdPaciente(id);
+
+                    return pacienteModel;
+                }
+
+                return null;
+            }
+        }
+    }
+    
+    public List<PacienteModel> getAllPacientes() throws SQLException, DataBasePessoaException {
+        String sql = "SELECT * FROM tb_paciente";
+
+        try (PreparedStatement ps = this.connection.prepareStatement(sql)) {
+            try (ResultSet rs = ps.executeQuery()) {
+
+                List<PacienteModel> pacientes = new ArrayList<>();
+                while(rs.next()) {
+                    PacienteModel pacienteModel = new PacienteModel();
+                    pacienteModel.setIdPessoa(rs.getInt("id_pessoa"));
+                    pacienteModel = (PacienteModel) pessoaRepository.getPessoaById(pacienteModel);
+                    pacienteModel.setAtivo(rs.getBoolean("st_ativo"));
+
+                    pacientes.add(pacienteModel);
+                }
+
+                return pacientes;
+            }
+        }
+    }
+    
+    public PacienteModel updatePaciente(PacienteModel pacienteModel) throws SQLException, DataBasePessoaException {
+        String sql = "SELECT id_pessoa FROM tb_paciente WHERE id = ?";
+        
+        try (PreparedStatement ps = this.connection.prepareStatement(sql)) {
+            ps.setInt(1, pacienteModel.getIdPaciente());
             
-            if (rs.next()) {
-                PacienteModel pacienteModel = new PacienteModel();
-                pacienteModel.setIdPessoa(rs.getInt("id_pessoa"));
-                pacienteModel = (PacienteModel) pessoaRepository.getPessoaById(pacienteModel);
-                pacienteModel.setAtivo(rs.getBoolean("st_ativo"));
-                pacienteModel.setIdPaciente(id);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    pacienteModel.setIdPessoa(rs.getInt(1));
+                }
                 
+                pessoaRepository.updatePessoa(pacienteModel);
                 return pacienteModel;
             }
-            
-        } catch (SQLException ex) {
-            throw new DataBaseException(ex.getMessage());
         }
-
-        return null;
     }
     
-    public ArrayList<PacienteModel> getAllPacientes() {
-        String sql = "SELECT * FROM tb_paciente";
-        PreparedStatement ps = null;
-        ResultSet rs = null;
-
-        ArrayList<PacienteModel> pacientes = new ArrayList<>();
-        try {
-            ps = this.connection.prepareStatement(sql);
-            rs = ps.executeQuery();
-
-            while(rs.next()) {
-                PacienteModel pacienteModel = new PacienteModel();
-                pacienteModel.setIdPessoa(rs.getInt("id_pessoa"));
-                pacienteModel = (PacienteModel) pessoaRepository.getPessoaById(pacienteModel);
-                pacienteModel.setAtivo(rs.getBoolean("st_ativo"));
-                
-                pacientes.add(pacienteModel);
-            }
-
-        } catch (SQLException ex) {
-            throw new DataBaseException(ex.getMessage());
-        }
-        
-        return pacientes;
-    }
-    
-    public PacienteModel updatePaciente(PacienteModel pacienteModel) {
-        String sql = "SELECT id_pessoa FROM tb_paciente WHERE id = ?";
-        PreparedStatement ps = null;
-        ResultSet rs = null;
-        
-        try {
-            ps = this.connection.prepareStatement(sql);
-            ps.setInt(1, pacienteModel.getIdPaciente());
-            rs = ps.executeQuery();
-            
-            if (rs.next()) {
-                pacienteModel.setIdPessoa(rs.getInt(1));
-            }
-            
-        } catch (SQLException ex) {
-            throw new DataBaseException(ex.getMessage());
-        }
-        
-        pessoaRepository.updatePessoa(pacienteModel);
-        
-        return pacienteModel;
-    }
-    
-    public int desativaPaciente(int id) throws SQLException{
+    public boolean desativaPaciente(int id) throws SQLException{
         String sql = "UPDATE tb_paciente SET st_ativo = ? " +
                 "WHERE id = ?";
-        PreparedStatement ps = null;
         
-        try {
-            ps = this.connection.prepareStatement(sql);
-            
+        try (PreparedStatement ps = this.connection.prepareStatement(sql)) {
             ps.setBoolean(1, false);
             ps.setInt(2, id);
-            
-            return ps.executeUpdate();
-        } catch (SQLException ex) {
-            throw new DataBaseException(ex.getMessage());
+
+            int linhasDelete = ps.executeUpdate();
+            return linhasDelete > 0;
         }
     }
+        
     
-    public boolean isPacienteAtivo(int id) {
+    public boolean isPacienteAtivo(int id) throws SQLException {
         String sql = "SELECT st_ativo FROM tb_paciente "
                 + "WHERE id = ?";
-        PreparedStatement ps = null;
-        ResultSet rs = null;
         
-        try {
-            ps = this.connection.prepareStatement(sql);
+        try (PreparedStatement ps = this.connection.prepareStatement(sql)) {
             ps.setInt(1, id);
-            rs = ps.executeQuery();
-            
-            if(rs.next()) {
-                return rs.getBoolean("st_ativo");
+         
+            try (ResultSet rs = ps.executeQuery()) {
+                if(rs.next()) {
+                    return rs.getBoolean("st_ativo");
+                }
+
+                return false;
             }
-            
-        } catch (SQLException ex) {
-            throw new DataBaseException(ex.getMessage());
         }
-        
-        return false;
     }
     
 }

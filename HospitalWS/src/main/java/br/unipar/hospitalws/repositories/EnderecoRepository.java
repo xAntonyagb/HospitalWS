@@ -1,6 +1,6 @@
 package br.unipar.hospitalws.repositories;
 
-import br.unipar.hospitalws.exceptions.DataBaseException;
+import br.unipar.hospitalws.infrastructure.ConnectionFactory;
 import br.unipar.hospitalws.models.EnderecoModel;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -13,19 +13,15 @@ public class EnderecoRepository {
 
     Connection connection = null;
     
-    public EnderecoRepository(Connection connection) throws SQLException {
-        this.connection = connection;
+    public EnderecoRepository() {
+        this.connection = ConnectionFactory.getConnection();
     }
     
-    public EnderecoModel insertEndereco(EnderecoModel enderecoModel) {
+    public EnderecoModel insertEndereco(EnderecoModel enderecoModel) throws SQLException {
         String sql = "INSERT INTO tb_endereco (numero, complemento, bairro, cidade, uf, cep) "
                 + "VALUES (?, ?, ?, ?, ?, ?)";
         
-        PreparedStatement ps = null;
-        ResultSet rs = null;
-        
-        try {
-            ps = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
+        try (PreparedStatement ps = this.connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             ps.setString(1, enderecoModel.getNumero());
             ps.setString(2, enderecoModel.getComplemento());
             ps.setString(3, enderecoModel.getBairro());
@@ -33,94 +29,75 @@ public class EnderecoRepository {
             ps.setString(5, enderecoModel.getUF());
             ps.setString(6, enderecoModel.getCEP());
             ps.executeUpdate();
-            
-            rs = ps.getGeneratedKeys();
-            
-            rs.next();
-            enderecoModel.setIdEndereco(rs.getInt(1));
-            
-        } catch (SQLException ex) {
-            throw new DataBaseException(ex.getMessage());
+
+            try (ResultSet rs = ps.getGeneratedKeys()) {
+                rs.next();
+                enderecoModel.setIdEndereco(rs.getInt(1));
+
+                return enderecoModel;
+            }
         }
-        
-        return enderecoModel;
     }
     
-    public EnderecoModel getEnderecoById(int id) {
+    public EnderecoModel getEnderecoById(int id) throws SQLException {
         String sql = "SELECT * FROM tb_endereco "
                 + "WHERE id = ?";
         
-        PreparedStatement ps = null;
-        ResultSet rs = null;
-        
-        try {
-            ps = connection.prepareStatement(sql);
+        try (PreparedStatement ps = this.connection.prepareStatement(sql)) {
             ps.setInt(1, id);
-            rs = ps.executeQuery();
-            
-            if(rs.next()) {
-                EnderecoModel endereco = new EnderecoModel();
-                endereco.setIdEndereco(rs.getInt(1));
-                endereco.setNumero(rs.getString(2));
-                endereco.setComplemento(rs.getString(3));
-                endereco.setBairro(rs.getString(4));
-                endereco.setCidade(rs.getString(5));
-                endereco.setUF(rs.getString(6));
-                endereco.setCEP(rs.getString(7));
-                
-                return endereco;
+
+            try (ResultSet rs = ps.executeQuery()) {
+                if(rs.next()) {
+                    EnderecoModel endereco = new EnderecoModel();
+                    endereco.setIdEndereco(rs.getInt(1));
+                    endereco.setNumero(rs.getString(2));
+                    endereco.setComplemento(rs.getString(3));
+                    endereco.setBairro(rs.getString(4));
+                    endereco.setCidade(rs.getString(5));
+                    endereco.setUF(rs.getString(6));
+                    endereco.setCEP(rs.getString(7));
+
+                    return endereco;
+                }
             }
-            
-        } catch (SQLException ex) {
-            throw new DataBaseException(ex.getMessage());
         }
-        
+ 
         return null;
     }
     
-    public ArrayList<EnderecoModel> getAllEnderecos() {
+    public ArrayList<EnderecoModel> getAllEnderecos() throws SQLException {
         String sql = "SELECT * FROM tb_endereco";
-        
-        PreparedStatement ps = null;
-        ResultSet rs = null;
         
         ArrayList<EnderecoModel> listEnderecos = new ArrayList<EnderecoModel>();
         
-        try {
-            ps = connection.prepareStatement(sql);
-            rs = ps.executeQuery();
-            
-            while(rs.next()) {
-                EnderecoModel endereco = new EnderecoModel();
+        try (PreparedStatement ps = this.connection.prepareStatement(sql)) {
+            try (ResultSet rs = ps.executeQuery()) {
+
+                while(rs.next()) {
+                    EnderecoModel endereco = new EnderecoModel();
+
+                    endereco.setIdEndereco(rs.getInt(1));
+                    endereco.setNumero(rs.getString(2));
+                    endereco.setComplemento(rs.getString(3));
+                    endereco.setBairro(rs.getString(4));
+                    endereco.setCidade(rs.getString(5));
+                    endereco.setUF(rs.getString(6));
+                    endereco.setCEP(rs.getString(7));
+
+                    listEnderecos.add(endereco);
+                }
                 
-                endereco.setIdEndereco(rs.getInt(1));
-                endereco.setNumero(rs.getString(2));
-                endereco.setComplemento(rs.getString(3));
-                endereco.setBairro(rs.getString(4));
-                endereco.setCidade(rs.getString(5));
-                endereco.setUF(rs.getString(6));
-                endereco.setCEP(rs.getString(7));
-                
-                listEnderecos.add(endereco);
+                return listEnderecos;
             }
-            
-        } catch (SQLException ex) {
-            throw new DataBaseException(ex.getMessage());
         }
-        
-        return listEnderecos;
     }
-    
-    public EnderecoModel updateEndereco(EnderecoModel enderecoModel) {
+        
+    public EnderecoModel updateEndereco(EnderecoModel enderecoModel) throws SQLException {
         String sql = "UPDATE tb_endereco SET "
                 + "numero = ?, complemento = ?, bairro = ?, cidade = ?, uf = ?, cep = ? "
                 + "WHERE id = ? ";
         
-        PreparedStatement ps = null;
-        
-        try {
-            ps = this.connection.prepareStatement(sql);
-            
+        try (PreparedStatement ps = this.connection.prepareStatement(sql)) {
             ps.setString(1, enderecoModel.getNumero());
             ps.setString(2, enderecoModel.getComplemento());
             ps.setString(3, enderecoModel.getBairro());
@@ -128,33 +105,22 @@ public class EnderecoRepository {
             ps.setString(5, enderecoModel.getUF());
             ps.setString(6, enderecoModel.getCEP());
             ps.setInt(7, enderecoModel.getIdEndereco());
-            
+
             ps.executeUpdate();
-        } catch (SQLException ex) {
-            throw new DataBaseException(ex.getMessage());
+
+            return enderecoModel;
         }
-        
-        return enderecoModel;
     }
     
-    public int deleteEndereco(int id) {
+    public int deleteEndereco(int id) throws SQLException {
         String sql = "DELETE FROM tb_endereco "
                 + "WHERE id = ?";
         
-        PreparedStatement ps = null;
-        int retorno;
-        
-        try {
-            ps = connection.prepareStatement(sql);
+        try (PreparedStatement ps = this.connection.prepareStatement(sql)) {
             ps.setInt(1, id);
 
-            retorno = ps.executeUpdate();
-            connection.commit();
-        } catch (SQLException ex) {
-            throw new DataBaseException(ex.getMessage());
+            return ps.executeUpdate();
         }
-        
-        return retorno;
     }
     
 }
