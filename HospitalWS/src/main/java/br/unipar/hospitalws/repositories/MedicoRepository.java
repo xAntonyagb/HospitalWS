@@ -10,6 +10,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.List;
 
 public class MedicoRepository {
 
@@ -60,9 +61,9 @@ public class MedicoRepository {
         return null;
     }
     
-    public ArrayList<MedicoModel> getAllMedicos() throws SQLException, DataBasePessoaException {
+    public List<MedicoModel> getAllMedicos() throws SQLException, DataBasePessoaException {
         String sql = "SELECT * FROM tb_medico";
-        ArrayList<MedicoModel> listMedicos = new ArrayList<MedicoModel>();
+        List<MedicoModel> listMedicos = new ArrayList<MedicoModel>();
         
         try (PreparedStatement ps = this.connection.prepareStatement(sql)) {
             try (ResultSet rs = ps.executeQuery()) {

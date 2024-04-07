@@ -23,6 +23,7 @@ D:\Faculdade\Progrmaacao para internet\HospitalWS\HospitalWS\src\main\java\br\un
 D:\Faculdade\Progrmaacao para internet\HospitalWS\HospitalWS\src\main\java\br\unipar\hospitalws\repositories\EnderecoRepository.java
 D:\Faculdade\Progrmaacao para internet\HospitalWS\HospitalWS\src\main\java\br\unipar\hospitalws\DTO\EnderecoDTO.java
 D:\Faculdade\Progrmaacao para internet\HospitalWS\HospitalWS\src\main\java\br\unipar\hospitalws\repositories\PacienteRepository.java
+D:\Faculdade\Progrmaacao para internet\HospitalWS\HospitalWS\src\main\java\br\unipar\hospitalws\exceptions\DataBasePessoaException.java
 D:\Faculdade\Progrmaacao para internet\HospitalWS\HospitalWS\src\main\java\br\unipar\hospitalws\services\MedicoService.java
 D:\Faculdade\Progrmaacao para internet\HospitalWS\HospitalWS\src\main\java\br\unipar\hospitalws\repositories\PessoaRepository.java
 D:\Faculdade\Progrmaacao para internet\HospitalWS\HospitalWS\src\main\java\br\unipar\hospitalws\enums\MotivoCancelamentoEnum.java

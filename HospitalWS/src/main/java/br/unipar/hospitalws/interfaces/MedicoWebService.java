@@ -6,7 +6,7 @@ import br.unipar.hospitalws.exceptions.InternalException;
 import br.unipar.hospitalws.exceptions.ValidationException;
 import jakarta.jws.WebMethod;
 import jakarta.jws.WebService;
-import java.util.ArrayList;
+import java.util.List;
 
 @WebService
 public interface MedicoWebService {
@@ -18,7 +18,7 @@ public interface MedicoWebService {
     MedicoDTO getMedicoById(int id) throws ValidationException, DataBaseException, InternalException;
     
     @WebMethod()
-    ArrayList<MedicoDTO> getAllMedicos() throws ValidationException, DataBaseException, InternalException;
+    List<MedicoDTO> getAllMedicos() throws ValidationException, DataBaseException, InternalException;
     
     @WebMethod()
     MedicoDTO updateMedico(MedicoDTO medico) throws ValidationException, DataBaseException, InternalException;

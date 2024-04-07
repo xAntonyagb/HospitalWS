@@ -104,7 +104,6 @@ public class PacienteService {
             retornoConsulta = this.pacienteRepository.getAllPacientes();
             
             for(PacienteModel pacienteModel : retornoConsulta) {
-                pacienteModel = (PacienteModel) this.pessoaRepository.getPessoaById(pacienteModel);
                 retorno.add(PacienteDTO.pacienteDTOMapper(pacienteModel));
             }
             

@@ -15,6 +15,7 @@ import br.unipar.hospitalws.utils.StringFormatterUtil;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -90,18 +91,17 @@ public class MedicoService {
         }
     }
     
-    public ArrayList<MedicoDTO> getAllMedicos() {
+    public List<MedicoDTO> getAllMedicos() {
         try {
             this.connection = ConnectionFactory.getConnection();
             this.medicoRepository = new MedicoRepository();
             
-            ArrayList<MedicoDTO> retorno = new ArrayList<MedicoDTO>();
-            ArrayList<MedicoModel> retornoConsulta = new ArrayList<MedicoModel>();
+            List<MedicoDTO> retorno = new ArrayList<MedicoDTO>();
+            List<MedicoModel> retornoConsulta = new ArrayList<MedicoModel>();
 
             retornoConsulta = this.medicoRepository.getAllMedicos();
             
             for(MedicoModel medicoModel : retornoConsulta) {
-                medicoModel = (MedicoModel) this.pessoaRepository.getPessoaById(medicoModel);
                 retorno.add(MedicoDTO.medicoDTOMapper(medicoModel));
             }
             

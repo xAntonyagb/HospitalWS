@@ -21,6 +21,7 @@ br\unipar\hospitalws\services\PessoaService.class
 br\unipar\hospitalws\models\ConsultaModel.class
 br\unipar\hospitalws\services\EnderecoService.class
 br\unipar\hospitalws\utils\StringFormatterUtil.class
+br\unipar\hospitalws\exceptions\DataBasePessoaException.class
 br\unipar\hospitalws\exceptions\DataBaseException.class
 br\unipar\hospitalws\interfaces\ConsultaWebService.class
 br\unipar\hospitalws\interfaces\PacienteWebService.class
