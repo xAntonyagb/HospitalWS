@@ -129,18 +129,11 @@ public class PacienteService {
             PessoaService.validaUpdatePessoa(pacienteModel);
             
             this.connection = ConnectionFactory.getConnection();
-            this.pessoaRepository = new PessoaRepository();
             this.pacienteRepository = new PacienteRepository();
-
-            PacienteModel pessoaRetorno = (PacienteModel) this.pessoaRepository.updatePessoa(pacienteModel);
-            pacienteModel.setIdPessoa(pessoaRetorno.getIdPessoa());
-            pacienteModel.setEndereco(pessoaRetorno.getEndereco());
-            pacienteModel.setNome(pessoaRetorno.getNome());
-            pacienteModel.setTelefone(pessoaRetorno.getTelefone());
-
-            pacienteModel = this.pacienteRepository.updatePaciente(pacienteModel);
             
+            pacienteModel = this.pacienteRepository.updatePaciente(pacienteModel);
             ConnectionFactory.commit();
+            
             return PacienteDTO.pacienteDTOMapper(pacienteModel);
         } 
         catch(SQLException ex) {

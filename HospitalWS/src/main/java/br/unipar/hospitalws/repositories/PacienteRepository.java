@@ -89,11 +89,16 @@ public class PacienteRepository {
                 if (rs.next()) {
                     pacienteModel.setIdPessoa(rs.getInt(1));
                 }
-                
-                pessoaRepository.updatePessoa(pacienteModel);
-                return pacienteModel;
             }
         }
+        
+        PacienteModel retorno = (PacienteModel) this.pessoaRepository.updatePessoa(pacienteModel);
+        pacienteModel.getEndereco().setIdEndereco(retorno.getEndereco().getIdEndereco());
+        
+        EnderecoRepository enderecoRepository = new EnderecoRepository();
+        enderecoRepository.updateEndereco(pacienteModel.getEndereco());
+        
+        return pacienteModel;
     }
     
     public boolean desativaPaciente(int id) throws SQLException{

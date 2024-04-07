@@ -128,13 +128,8 @@ public class MedicoService {
             
             this.connection = ConnectionFactory.getConnection();
             this.pessoaRepository = new PessoaRepository();
+            this.enderecoRepository = new EnderecoRepository();
             this.medicoRepository = new MedicoRepository();
-
-            MedicoModel pessoaRetorno = (MedicoModel) this.pessoaRepository.updatePessoa(medicoModel);
-            medicoModel.setIdPessoa(pessoaRetorno.getIdPessoa());
-            medicoModel.setNome(pessoaRetorno.getNome());
-            medicoModel.setTelefone(pessoaRetorno.getTelefone());
-            medicoModel.setEndereco(pessoaRetorno.getEndereco());
 
             medicoModel = this.medicoRepository.updateMedico(medicoModel);
             
@@ -162,6 +157,7 @@ public class MedicoService {
         try {
             this.connection = ConnectionFactory.getConnection();
             this.consultaRepository = new ConsultaRepository();
+            this.medicoRepository = new MedicoRepository();
             
             boolean isDesativado = this.medicoRepository.desativaMedico(id);
             if(!isDesativado) {

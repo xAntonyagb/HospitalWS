@@ -83,9 +83,19 @@ public class MedicoRepository {
             ps.setInt(1, medicoModel.getIdMedico());
             ps.executeQuery();
             
-            medicoModel = (MedicoModel) this.pessoaRepository.updatePessoa(medicoModel);
+            try (ResultSet rs = ps.executeQuery()) {
+                if(rs.next()) {
+                    medicoModel.setIdPessoa(rs.getInt("id_pessoa"));
+                }
+            }
         }
-
+            
+        MedicoModel retorno = (MedicoModel) this.pessoaRepository.updatePessoa(medicoModel);
+        medicoModel.getEndereco().setIdEndereco(retorno.getEndereco().getIdEndereco());
+        
+        EnderecoRepository enderecoRepository = new EnderecoRepository();
+        enderecoRepository.updateEndereco(medicoModel.getEndereco());
+        
         return medicoModel;
     }
     

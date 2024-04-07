@@ -80,7 +80,6 @@ public class PessoaRepository {
             ps.setString(1, pessoaModel.getNome());
             ps.setString(2, pessoaModel.getTelefone());
             ps.setInt(3, pessoaModel.getIdPessoa());
-            this.enderecoRepository.updateEndereco(pessoaModel.getEndereco());
 
             ps.executeUpdate();
             return getPessoaById(pessoaModel);
