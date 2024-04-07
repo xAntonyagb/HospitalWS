@@ -7,7 +7,7 @@ import br.unipar.hospitalws.exceptions.ValidationException;
 import br.unipar.hospitalws.interfaces.MedicoWebService;
 import br.unipar.hospitalws.services.MedicoService;
 import jakarta.jws.WebService;
-import java.util.ArrayList;
+import java.util.List;
 
 @WebService(endpointInterface = "br.unipar.hospitalws.interfaces.MedicoWebService")
 public class MedicoWebServiceImp implements MedicoWebService{
@@ -25,7 +25,7 @@ public class MedicoWebServiceImp implements MedicoWebService{
     }
 
     @Override
-    public ArrayList<MedicoDTO> getAllMedicos() throws ValidationException, DataBaseException, InternalException {
+    public List<MedicoDTO> getAllMedicos() throws ValidationException, DataBaseException, InternalException {
         return medicoService.getAllMedicos();
     }
 
