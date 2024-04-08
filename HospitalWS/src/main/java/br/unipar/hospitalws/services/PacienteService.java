@@ -1,6 +1,5 @@
 package br.unipar.hospitalws.services;
 
-import br.unipar.hospitalws.DTO.EnderecoDTO;
 import br.unipar.hospitalws.DTO.PacienteDTO;
 import br.unipar.hospitalws.exceptions.DataBaseException;
 import br.unipar.hospitalws.exceptions.InternalException;
@@ -49,6 +48,7 @@ public class PacienteService {
 
             int idPaciente = this.pacienteRepository.insertPaciente(pacienteModel);
             pacienteModel.setIdPaciente(idPaciente);
+            pacienteModel.setAtivo(true);
             
             ConnectionFactory.commit();
             return PacienteDTO.pacienteDTOMapper(pacienteModel);
@@ -132,8 +132,14 @@ public class PacienteService {
             this.pacienteRepository = new PacienteRepository();
             
             pacienteModel = this.pacienteRepository.updatePaciente(pacienteModel);
-            ConnectionFactory.commit();
+
+            //Retornar para o soap com os dados do banco
+            PacienteModel retornoPaciente = this.pacienteRepository.getPacienteById(pacienteModel.getIdPaciente());
+            pacienteModel.setAtivo(retornoPaciente.isAtivo());
+            pacienteModel.setGmail(retornoPaciente.getGmail());
+            pacienteModel.setCpf(retornoPaciente.getCpf());
             
+            ConnectionFactory.commit();
             return PacienteDTO.pacienteDTOMapper(pacienteModel);
         } 
         catch(SQLException ex) {

@@ -88,6 +88,10 @@ public class ConsultaService {
             logger.log(Level.SEVERE, "(getConsultaById) "+ ex.getMessage());
             throw new DataBaseException("erro ao pesquisar pela consulta.");
         }
+        catch(ValidationException ex) {
+            logger.log(Level.INFO, "(getConsultaById) Requisicao foi rejeitada pelo processo de validacao "+ ex.getMessage());
+            throw ex;
+        }
         catch(Exception ex) {
             logger.log(Level.SEVERE, "(getConsultaById) Um erro inesperado aconteceu: Nao foi possivel finalizar a execucao desse metodo. "+ ex.getMessage());
             throw new InternalException("cancelarConsulta");
@@ -357,6 +361,9 @@ public class ConsultaService {
     
     private MedicoModel getMedicoAleatrio(LocalDateTime horaConsulta) throws SQLException { 
         ArrayList<MedicoModel> listMedicos = this.consultaRepository.getMedicosDisponiveis(DateFormatterUtil.toTimestamp(horaConsulta));
+        if(listMedicos.size() == 0 ){
+            throw new ValidationException("Erro ao marcar consulta: Nenhum médico está disponivel neste horario");
+        }
         Random random = new Random();
         
         int posicao = random.nextInt(listMedicos.size());

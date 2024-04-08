@@ -20,7 +20,7 @@ public class ConsultaWebServiceImp implements ConsultaWebService{
     }
 
     @Override
-    public ConsultaDTO getConsultaById(int id) throws ValidationException, DataBaseException, InternalException {
+    public ConsultaDTO getConsultaById(int id) throws ValidationException, DataBaseException {
         return consultaService.getConsultaById(id);
     }
 

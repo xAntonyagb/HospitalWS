@@ -48,6 +48,7 @@ public class MedicoService {
             
             int idMedico = this.medicoRepository.insertMedico(medicoModel);
             medicoModel.setIdMedico(idMedico);
+            medicoModel.setAtivo(true);
             
             ConnectionFactory.commit();
             return MedicoDTO.medicoDTOMapper(medicoModel);
@@ -132,6 +133,14 @@ public class MedicoService {
             this.medicoRepository = new MedicoRepository();
 
             medicoModel = this.medicoRepository.updateMedico(medicoModel);
+            
+            //Retornar para o soap com os dados do banco
+            MedicoModel retornoMedico = this.medicoRepository.getMedicoById(medicoModel.getIdMedico());
+            medicoModel.setAtivo(retornoMedico.isAtivo());
+            medicoModel.setEspecialidade(retornoMedico.getEspecialidade());
+            medicoModel.setCRM(retornoMedico.getCRM());
+            medicoModel.setGmail(retornoMedico.getGmail());
+            medicoModel.setCpf(retornoMedico.getCpf());
             
             ConnectionFactory.commit();
             return MedicoDTO.medicoDTOMapper(medicoModel);
