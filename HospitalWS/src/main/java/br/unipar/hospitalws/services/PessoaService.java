@@ -175,7 +175,7 @@ public class PessoaService {
         EnderecoService.validaEndereco(pessoa.getEndereco());
         
         if(pessoa.getCpf() != null) {
-            throw new ValidationException("CPF infromado! VocÇe não pode atualizar o CPF de um cadastro já feito.");
+            throw new ValidationException("CPF informado! Voce não pode atualizar o CPF de um cadastro já feito.");
         }
         if(pessoa.getNome() == null) {
             throw new ValidationException("Nome inválido! Porfavor informe algum nome");
