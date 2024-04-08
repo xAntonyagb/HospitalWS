@@ -72,7 +72,7 @@ public class ConnectionFactory {
         }
     }
     
-    public void closePreparedStatement(PreparedStatement ps) {
+    public static void closePreparedStatement(PreparedStatement ps) {
         try {
             if(ps != null) {
                 ps.close();
@@ -82,7 +82,7 @@ public class ConnectionFactory {
         }
     }
     
-    public void closeResultSet(ResultSet rs) {
+    public static void closeResultSet(ResultSet rs) {
         try {
             if(rs != null) {
                 rs.close();

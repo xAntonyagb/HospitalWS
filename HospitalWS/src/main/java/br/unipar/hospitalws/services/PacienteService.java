@@ -1,27 +1,201 @@
 package br.unipar.hospitalws.services;
 
-import br.unipar.hospitalws.DTO.EnderecoDTO;
 import br.unipar.hospitalws.DTO.PacienteDTO;
 import br.unipar.hospitalws.exceptions.DataBaseException;
+import br.unipar.hospitalws.exceptions.InternalException;
 import br.unipar.hospitalws.exceptions.ValidationException;
 import br.unipar.hospitalws.infrastructure.ConnectionFactory;
 import br.unipar.hospitalws.models.EnderecoModel;
 import br.unipar.hospitalws.models.PacienteModel;
 import br.unipar.hospitalws.repositories.ConsultaRepository;
+import br.unipar.hospitalws.repositories.EnderecoRepository;
 import br.unipar.hospitalws.repositories.PacienteRepository;
+import br.unipar.hospitalws.repositories.PessoaRepository;
 import br.unipar.hospitalws.utils.StringFormatterUtil;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class PacienteService {
     
-    private ConnectionFactory connectionFactory = new ConnectionFactory();
     private Connection connection = null;
     private PacienteRepository pacienteRepository = null;
-    private PessoaService pessoaService = new PessoaService();
-    private EnderecoService enderecoService = new EnderecoService();
+    private PessoaRepository pessoaRepository = null;
+    private EnderecoRepository enderecoRepository = null;
     private ConsultaRepository consultaRepository = null;
+    
+    private final Logger logger = Logger.getLogger("PacienteService");
+    
+    
+    public PacienteDTO insertPaciente(PacienteDTO pacienteDTO) {
+        try {
+            PacienteModel pacienteModel = ajustaPaciente(pacienteDTO);
+            PessoaService.validaInsertPessoa(pacienteModel);
+        
+            this.connection = ConnectionFactory.getConnection();
+            this.enderecoRepository = new EnderecoRepository();
+            this.pessoaRepository = new PessoaRepository();
+            this.pacienteRepository = new PacienteRepository();
+            
+            EnderecoModel enderecoRetorno = this.enderecoRepository.insertEndereco(pacienteModel.getEndereco());
+            pacienteModel.setEndereco(enderecoRetorno);
+            
+            int idPessoa = this.pessoaRepository.insertPessoa(pacienteModel).getIdPessoa();
+            pacienteModel.setIdPessoa(idPessoa);
+
+            int idPaciente = this.pacienteRepository.insertPaciente(pacienteModel);
+            pacienteModel.setIdPaciente(idPaciente);
+            pacienteModel.setAtivo(true);
+            
+            ConnectionFactory.commit();
+            return PacienteDTO.pacienteDTOMapper(pacienteModel);
+        } 
+        catch(SQLException ex) {
+            logger.log(Level.SEVERE, "(insertPaciente) "+ ex.getMessage());
+            throw new DataBaseException("erro ao inserir um novo paciente.");
+        }
+        catch(ValidationException ex) {
+            logger.log(Level.INFO, "(insertPaciente) Requisicao foi rejeitada pelo processo de validacao "+ ex.getMessage());
+            throw ex;
+        }
+        catch(Exception ex) {
+            logger.log(Level.SEVERE, "(insertPaciente) Um erro inesperado aconteceu: Nao foi possivel finalizar a execução desse metodo. "+ ex.getMessage());
+            throw new InternalException("insertPaciente");
+        }
+        finally {
+            ConnectionFactory.closeConnection();
+        }
+    }
+    
+    public PacienteDTO getPacienteById(int id) {
+        try {
+            this.connection = ConnectionFactory.getConnection();
+            this.pacienteRepository = new PacienteRepository();
+            
+            PacienteModel retorno = this.pacienteRepository.getPacienteById(id);
+            ConnectionFactory.commit();
+            
+            return PacienteDTO.pacienteDTOMapper(retorno);
+        } 
+        catch(SQLException ex) {
+            logger.log(Level.SEVERE, "(getPacienteById) "+ ex.getMessage());
+            throw new DataBaseException("erro ao pesquisar por paciente.");
+        }
+        catch(Exception ex) {
+            logger.log(Level.SEVERE, "(getPacienteById) Um erro inesperado aconteceu: Nao foi possivel finalizar a execução desse metodo. "+ ex.getMessage());
+            throw new InternalException("getPacienteById");
+        }
+        finally {
+            ConnectionFactory.closeConnection();
+        }
+    }
+    
+    public List<PacienteDTO> getAllPacientes() {
+        try {
+            this.connection = ConnectionFactory.getConnection();
+            this.pacienteRepository = new PacienteRepository();
+            
+            List<PacienteDTO> retorno = new ArrayList<PacienteDTO>();
+            List<PacienteModel> retornoConsulta = new ArrayList<PacienteModel>();
+
+            retornoConsulta = this.pacienteRepository.getAllPacientes();
+            
+            for(PacienteModel pacienteModel : retornoConsulta) {
+                retorno.add(PacienteDTO.pacienteDTOMapper(pacienteModel));
+            }
+            
+            ConnectionFactory.commit();
+            return retorno;
+        } 
+        catch(SQLException ex) {
+            logger.log(Level.SEVERE, "(getAllPacientes) "+ ex.getMessage());
+            throw new DataBaseException("erro ao pesquisar por pacientes.");
+        }
+        catch(Exception ex) {
+            logger.log(Level.SEVERE, "(getAllPacientes) Um erro inesperado aconteceu: Nao foi possivel finalizar a execução desse metodo. "+ ex.getMessage());
+            throw new InternalException("getAllPacientes");
+        }
+        finally {
+            ConnectionFactory.closeConnection();
+        }
+    }
+    
+    public PacienteDTO updatePaciente(PacienteDTO pacienteDTO) {
+        try {
+            PacienteModel pacienteModel = ajustaPaciente(pacienteDTO);
+            PessoaService.validaUpdatePessoa(pacienteModel);
+            
+            this.connection = ConnectionFactory.getConnection();
+            this.pacienteRepository = new PacienteRepository();
+            
+            pacienteModel = this.pacienteRepository.updatePaciente(pacienteModel);
+
+            //Retornar para o soap com os dados do banco
+            PacienteModel retornoPaciente = this.pacienteRepository.getPacienteById(pacienteModel.getIdPaciente());
+            pacienteModel.setAtivo(retornoPaciente.isAtivo());
+            pacienteModel.setGmail(retornoPaciente.getGmail());
+            pacienteModel.setCpf(retornoPaciente.getCpf());
+            
+            ConnectionFactory.commit();
+            return PacienteDTO.pacienteDTOMapper(pacienteModel);
+        } 
+        catch(SQLException ex) {
+            logger.log(Level.SEVERE, "(updatePaciente) "+ ex.getMessage());
+            throw new DataBaseException("erro ao atualizar cadastro de paciente.");
+        }
+        catch(ValidationException ex) {
+            logger.log(Level.INFO, "(updatePaciente) Requisicao foi rejeitada pelo processo de validacao "+ ex.getMessage());
+            throw ex;
+        }
+        catch(Exception ex) {
+            logger.log(Level.SEVERE, "(updatePaciente) Um erro inesperado aconteceu: Nao foi possivel finalizar a execução desse metodo. "+ ex.getMessage());
+            throw new InternalException("updatePaciente");
+        }
+        finally {
+            ConnectionFactory.closeConnection();
+        }
+    }
+    
+    public PacienteDTO desativaPaciente(int id) {
+         try {
+            this.connection = ConnectionFactory.getConnection();
+            this.pacienteRepository = new PacienteRepository();
+            this.consultaRepository = new ConsultaRepository();
+
+            boolean isDesativado = this.pacienteRepository.desativaPaciente(id);
+            if(!isDesativado) {
+                throw new ValidationException("Erro ao desativar: Não foi possivel encontrar esse paciente");
+            }
+            
+            PacienteDTO retorno = new PacienteDTO();
+            retorno.setId(id);
+            retorno.setAtivo(false);
+            
+            this.consultaRepository.cancelarConsultaByIdPaciente(id);
+            ConnectionFactory.commit();
+            
+            return retorno;
+        } 
+        catch(SQLException ex) {
+            logger.log(Level.SEVERE, "(desativaPaciente) "+ ex.getMessage());
+            throw new DataBaseException("erro ao desativar paciente.");
+        }
+        catch(ValidationException ex) {
+            logger.log(Level.INFO, "(desativaPaciente) Requisicao foi rejeitada pelo processo de validacao "+ ex.getMessage());
+            throw ex;
+        }
+        catch(Exception ex) {
+            logger.log(Level.SEVERE, "(desativaPaciente) Um erro inesperado aconteceu: Nao foi possivel finalizar a execução desse metodo. "+ ex.getMessage());
+            throw new InternalException("desativaPaciente");
+        }
+        finally {
+            ConnectionFactory.closeConnection();
+        }
+    }
+    
     
     private PacienteModel ajustaPaciente(PacienteDTO paciente) {
         paciente.setBairro(StringFormatterUtil.ajustaNormalInput(paciente.getBairro()));
@@ -37,155 +211,6 @@ public class PacienteService {
         paciente.setTelefone(StringFormatterUtil.ajustaNumberInput(paciente.getTelefone()));
         
         return PacienteModel.pacienteModelMapper(paciente);
-    }
-    
-    public PacienteDTO insertPaciente(PacienteDTO pacienteDTO) {
-        PacienteModel pacienteModel = ajustaPaciente(pacienteDTO);
-        
-        try {
-            EnderecoModel enderecoRetorno = EnderecoModel.enderecoModelMapper( //Converte para Model 
-                    enderecoService.insertEndereco( //Exige e retorna DTO 
-                            EnderecoDTO.enderecoDTOMapper(pacienteModel.getEndereco() //Converte para DTO 
-                            )));
-            
-            pacienteModel.setEndereco(enderecoRetorno);
-
-            int idPessoa = pessoaService.insertPessoa(pacienteModel, true)
-                    .getIdPessoa();
-            pacienteModel.setIdPessoa(idPessoa);
-
-            pacienteRepository = new PacienteRepository();
-
-            pacienteModel = pacienteRepository.insertPaciente(pacienteModel);
-            connection.commit();
-        } 
-        catch (SQLException ex) {
-            throw new DataBaseException(ex.getMessage());
-        } 
-        finally {
-            ConnectionFactory.closeConnection();
-        }
-        
-        return PacienteDTO.pacienteDTOMapper(pacienteModel);
-    }
-    
-    public PacienteDTO getPacienteById(int id) {
-        PacienteModel retorno = new PacienteModel();
-        
-        try {
-            connection = connectionFactory.getConnection();
-            pacienteRepository = new PacienteRepository();
-
-            retorno = pacienteRepository.getPacienteById(id);
-            connection.commit();
-            
-        } catch (SQLException ex) {
-            throw new DataBaseException(ex.getMessage());
-        }
-        finally {
-            ConnectionFactory.closeConnection();
-        }
-        
-        return PacienteDTO.pacienteDTOMapper(retorno);
-    }
-    
-    public ArrayList<PacienteDTO> getAllPacientes() {
-        ArrayList<PacienteModel> consulta = new ArrayList<PacienteModel>();
-        ArrayList<PacienteDTO> retorno = new ArrayList<PacienteDTO>();
-        
-        try {
-            connection = connectionFactory.getConnection();
-            pacienteRepository = new PacienteRepository();
-
-            consulta = pacienteRepository.getAllPacientes();
-            
-            for(PacienteModel pacienteModel : consulta) {
-                retorno.add(PacienteDTO.pacienteDTOMapper(pacienteModel));
-            }
-            
-            connection.commit();
-            
-        } catch (SQLException ex) {
-            throw new DataBaseException(ex.getMessage());
-        }
-        finally {
-            ConnectionFactory.closeConnection();
-        }
-        
-        return retorno;
-    }
-    
-    public PacienteDTO updatePaciente(PacienteDTO pacienteDTO) {
-        PacienteModel pacienteModel = ajustaPaciente(pacienteDTO);
-        
-        try {
-            EnderecoModel enderecoRetorno = EnderecoModel.enderecoModelMapper( //Converte para Model 
-                    enderecoService.insertEndereco( //Exige e retorna DTO 
-                            EnderecoDTO.enderecoDTOMapper(pacienteModel.getEndereco() //Converte para DTO 
-                            )));
-            
-            pacienteModel.setEndereco(enderecoRetorno);
-
-            if(pacienteModel.getCpf() != null) {
-                throw new ValidationException("Não se pode atualizar o cpf de um paciente!");
-            }
-            if(pacienteModel.getGmail() != null ){
-                throw new ValidationException("Não se pode atualizar o e-mail de um paciente!");
-            }
-            
-            if(pacienteModel.getNome() == null){
-                throw new ValidationException("Nome inválido! Porfavor informe algum nome");
-            }
-            if(pacienteModel.getTelefone() == null){
-                throw new ValidationException("Telefone inválido! Porfavor informe um telefone válido");
-            }
-
-            int idPessoa = pessoaService.updatePessoa(pacienteModel, false)
-                    .getIdPessoa();
-            pacienteModel.setIdPessoa(idPessoa);
-            
-            pacienteRepository = new PacienteRepository();
-
-            pacienteModel = pacienteRepository.updatePaciente(pacienteModel);
-            ConnectionFactory.commit();
-        } 
-        catch (SQLException ex) {
-            throw new DataBaseException(ex.getMessage());
-        } 
-        finally {
-            ConnectionFactory.closeConnection();
-        }
-        
-        return PacienteDTO.pacienteDTOMapper(pacienteModel);
-    }
-    
-    public PacienteDTO desativaPaciente(int id) {
-        PacienteDTO retorno = new PacienteDTO();
-        
-         try {
-            connection = connectionFactory.getConnection();
-            pacienteRepository = new PacienteRepository();
-            consultaRepository = new ConsultaRepository();
-
-            int retornoConsulta = pacienteRepository.desativaPaciente(id);
-            if(retornoConsulta == 0) {
-                throw new ValidationException("Erro ao deletar: Não foi possivel encontrar esse paciente");
-            }
-            
-            retorno.setId(id);
-            retorno.setAtivo(false);
-            
-            consultaRepository.cancelarConsultaByIdPaciente(id);
-            connection.commit();
-            
-        } catch (SQLException ex) {
-            throw new DataBaseException(ex.getMessage());
-        }
-        finally {
-            ConnectionFactory.closeConnection();
-        }
-        
-        return retorno;
     }
     
 }

@@ -177,10 +177,10 @@ public class ConsultaRepository {
                     + "WHERE ? BETWEEN c.horario_consulta AND (c.horario_consulta + INTERVAL '1 HOUR') " // não precisa de cast pq já é do banco
                 
                         // Ou quando o horário informado irá futuramente entrar em conflito com um periodo de uma consulta afrente
-                        + "OR (CAST(? AS TIMESTAMP) + INTERVAL '1 HOUR' " // Cast para adicionar intervalo
-                        + "NOT BETWEEN c.horario_consulta AND (c.horario_consulta + INTERVAL '1 HOUR') "
+                        + "AND (CAST(? AS TIMESTAMP) + INTERVAL '1 HOUR') " // Cast para adicionar intervalo
+                        + "BETWEEN c.horario_consulta AND (c.horario_consulta + INTERVAL '1 HOUR') "
                         + ")"
-                + ")"; // Funcionando /o/
+                + "AND m.st_ativo = true"; // Funcionando /o/
         
         
         ArrayList<MedicoModel> listMedicos = new ArrayList<>();

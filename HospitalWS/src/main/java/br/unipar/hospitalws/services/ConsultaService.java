@@ -2,6 +2,7 @@ package br.unipar.hospitalws.services;
 
 import br.unipar.hospitalws.DTO.ConsultaDTO;
 import br.unipar.hospitalws.exceptions.DataBaseException;
+import br.unipar.hospitalws.exceptions.DataBasePessoaException;
 import br.unipar.hospitalws.exceptions.FormattingException;
 import br.unipar.hospitalws.exceptions.InternalException;
 import br.unipar.hospitalws.exceptions.ValidationException;
@@ -88,7 +89,7 @@ public class ConsultaService {
             throw new DataBaseException("erro ao pesquisar pela consulta.");
         }
         catch(ValidationException ex) {
-            logger.log(Level.INFO, "(getConsultaById) Requisição foi rejeitada pelo processo de validação "+ ex.getMessage());
+            logger.log(Level.INFO, "(getConsultaById) Requisicao foi rejeitada pelo processo de validacao "+ ex.getMessage());
             throw ex;
         }
         catch(Exception ex) {
@@ -118,10 +119,6 @@ public class ConsultaService {
         catch(SQLException ex) {
             logger.log(Level.SEVERE, "(getAllConsultas) "+ ex.getMessage());
             throw new DataBaseException("erro ao pesquisar pelas consultas.");
-        }
-        catch(ValidationException ex) {
-            logger.log(Level.INFO, "(getAllConsultas) Requisição foi rejeitada pelo processo de validação "+ ex.getMessage());
-            throw ex;
         }
         catch(Exception ex) {
             logger.log(Level.SEVERE, "(getAllConsultas) Um erro inesperado aconteceu: Nao foi possivel finalizar a execucao desse metodo. "+ ex.getMessage());
@@ -157,7 +154,7 @@ public class ConsultaService {
         }
         catch(Exception ex) {
             logger.log(Level.SEVERE, "(updateConsulta) Um erro inesperado aconteceu: Nao foi possivel finalizar a execucao desse metodo. "+ ex.getMessage());
-            throw new InternalException("cancelarConsulta");
+            throw new InternalException("updateConsulta");
         }
         finally {
             ConnectionFactory.closeConnection();
@@ -176,7 +173,7 @@ public class ConsultaService {
             if(!isCancelada)
                 throw new ValidationException("Erro ao cancelar consulta: Essa consulta nao foi agendada ou ja foi cancelada!");
 
-            consultaModel = consultaRepository.getConsultaById(consulta.getId());
+            consultaModel = this.consultaRepository.getConsultaById(consulta.getId());
             ConnectionFactory.commit();
             
             return ConsultaDTO.consultaDTOMapper(consultaModel);
@@ -201,7 +198,7 @@ public class ConsultaService {
     
     
     //Validações
-    private ConsultaModel validaConsulta(ConsultaModel consulta) throws SQLException {
+    private ConsultaModel validaConsulta(ConsultaModel consulta) throws SQLException, DataBasePessoaException {
         this.medicoRepository = new MedicoRepository();
         this.pacienteRepository = new PacienteRepository();
         
@@ -283,7 +280,7 @@ public class ConsultaService {
         throw new ValidationException("Erro ao marcar consulta: Você não pode marcar uma consulta com menos de 30 minutos de antecedencia!");
     } 
     
-    private boolean isPacienteAtivo(int id) {
+    private boolean isPacienteAtivo(int id) throws SQLException {
         if(this.pacienteRepository.isPacienteAtivo(id)) {
             return true;
         }
@@ -291,7 +288,7 @@ public class ConsultaService {
         throw new ValidationException("Erro ao marcar consulta: Você não pode marcar uma consulta com um cadastro de paciente inativo!");
     } 
     
-    private boolean isMedicoAtivo(int id) {
+    private boolean isMedicoAtivo(int id) throws SQLException {
         if(this.medicoRepository.isMedicoAtivo(id)) {
             return true;
         }
@@ -364,6 +361,9 @@ public class ConsultaService {
     
     private MedicoModel getMedicoAleatrio(LocalDateTime horaConsulta) throws SQLException { 
         ArrayList<MedicoModel> listMedicos = this.consultaRepository.getMedicosDisponiveis(DateFormatterUtil.toTimestamp(horaConsulta));
+        if(listMedicos.size() == 0 ){
+            throw new ValidationException("Erro ao marcar consulta: Nenhum médico está disponivel neste horario");
+        }
         Random random = new Random();
         
         int posicao = random.nextInt(listMedicos.size());
