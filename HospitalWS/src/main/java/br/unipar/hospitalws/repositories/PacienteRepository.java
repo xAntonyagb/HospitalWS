@@ -68,8 +68,8 @@ public class PacienteRepository {
                 while(rs.next()) {
                     PacienteModel pacienteModel = new PacienteModel();
                     pacienteModel.setIdPessoa(rs.getInt("id_pessoa"));
-                    pacienteModel.setIdPessoa(rs.getInt("id_paciente"));
                     pacienteModel = (PacienteModel) pessoaRepository.getPessoaById(pacienteModel);
+                    pacienteModel.setIdPaciente(rs.getInt("id"));
                     pacienteModel.setAtivo(rs.getBoolean("st_ativo"));
 
                     pacientes.add(pacienteModel);
