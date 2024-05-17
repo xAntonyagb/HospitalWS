@@ -8,7 +8,7 @@ import jakarta.ws.rs.core.Application;
  * @author Antony
  */
 
-@ApplicationPath("/hospitalws")
+@ApplicationPath("/api")
 public class HospitalWsApplication extends Application {
     
 }

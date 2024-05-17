@@ -44,6 +44,7 @@ br\unipar\hospitalws\interfaces\PacienteWebService.class
 br\unipar\hospitalws\resources\rest\controllers\PacienteRestController.class
 br\unipar\hospitalws\DTO\ConsultaDTO.class
 br\unipar\hospitalws\resources\soap\PacienteWebServiceImp.class
+br\unipar\hospitalws\resources\rest\controllers\TestRestController.class
 br\unipar\hospitalws\providers\ExceptionProvider.class
 br\unipar\hospitalws\exceptions\InternalException.class
 br\unipar\hospitalws\models\PacienteModel.class

@@ -19,7 +19,7 @@ import java.util.logging.Logger;
 public class FormattingExceptionProvider implements ExceptionMapper<FormattingException> {
 
     @Context
-    private static HttpServletRequest request;
+    private HttpServletRequest request;
     
     @Override
     public Response toResponse(FormattingException ex) {

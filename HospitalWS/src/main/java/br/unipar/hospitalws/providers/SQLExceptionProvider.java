@@ -19,7 +19,7 @@ import java.util.logging.Logger;
 public class SQLExceptionProvider implements ExceptionMapper<SQLException> {
 
     @Context
-    private static HttpServletRequest request;
+    private HttpServletRequest request;
     
     @Override
     public Response toResponse(SQLException ex) {

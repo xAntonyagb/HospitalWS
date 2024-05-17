@@ -19,7 +19,7 @@ import java.util.logging.Logger;
 public class ValidationExceptionProvider implements ExceptionMapper<ValidationException> {
 
     @Context
-    private static HttpServletRequest request;
+    private HttpServletRequest request;
     
     @Override
     public Response toResponse(ValidationException ex) {

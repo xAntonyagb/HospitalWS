@@ -19,7 +19,7 @@ import java.util.logging.Logger;
 public class DataBaseExceptionProvider implements ExceptionMapper<DataBaseException> {
 
     @Context
-    private static HttpServletRequest request;
+    private HttpServletRequest request;
     
     @Override
     public Response toResponse(DataBaseException ex) {

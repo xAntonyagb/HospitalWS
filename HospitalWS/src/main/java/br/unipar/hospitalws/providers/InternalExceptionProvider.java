@@ -19,7 +19,7 @@ import java.util.logging.Logger;
 public class InternalExceptionProvider implements ExceptionMapper<InternalException> {
 
     @Context
-    private static HttpServletRequest request;
+    private HttpServletRequest request;
     
     @Override
     public Response toResponse(InternalException ex) {

@@ -18,7 +18,7 @@ import java.util.logging.Logger;
 public class ExceptionProvider implements ExceptionMapper<Exception> {
 
     @Context
-    private static HttpServletRequest request;
+    private HttpServletRequest request;
     
     @Override
     public Response toResponse(Exception ex) {
