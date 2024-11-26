@@ -1,4 +1,4 @@
-package br.unipar.hospitalws;
+package br.unipar.hospitalws.resources.soap;
 
 import br.unipar.hospitalws.DTO.EnderecoDTO;
 import br.unipar.hospitalws.exceptions.DataBaseException;
